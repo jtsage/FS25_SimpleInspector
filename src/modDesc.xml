@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="79">
+<modDesc descVersion="93">
     <title>
         <en>Simple Inspector</en>
         <de>Einfacher Inspektor</de>
@@ -21,39 +21,7 @@ Display Options:
 
 Default Input Bindings:
 Left Ctrl + Left Alt + Num Pad 9 : Reload configuration file from disk
-Left Alt + Num Pad 9 : Toggle HUD Visibility
-
-Changelog:
-v1.0.2.5 :
- - add trap for driving direction not supported
-v1.0.2.4 :
- - Add driving direction to speed display
- - Add option to display even if the HUD is hidden
-v1.0.2.3 :
- - Format numbers with localization
- - Fix top-left display to play nice with Precision Farming
- - Add option to convert units for display
- - Add Beacon Light indicator option
- - Hide Inspector when positioned above map and chat is shown (MP)
-v1.0.2.0 :
- - Add CoursePlay and AutoDrive time remaining display
-v1.0.1.10 (since 1.0.0.0) :
- - Fix for missing fillLevel info on right justified displays.
- - Add damage indicator (default if tractor or attached implement is 80% damaged)
- - Add CoursePlay and AutoDrive AI detection
- - Hide conveyor belts, they don't have any useful information to share.
- - Add option to zero pad field numbers less than 10
- - Make bold text optional
- - Add user name for controlled vehicles.
- - Compute fill percentage with maxMass respected when possible
- - Add optional alphabetic sorting of the list (uses purchase / tab order otherwise)
- - Add multiplayer farm awareness - allow filtering to just your farm, or all farms
- - Add option to change text size from settings, fix loading of text size from xml
- - Additional Feature: custom order per line
- - Add Support for Advanced Farm Manager
- - Add DEF level (optional, default off)
-
-]]></en>
+Left Alt + Num Pad 9 : Toggle HUD Visibility]]></en>
         <de><![CDATA[Einfacher Inspektor zeigt ein HUD-Overlay mit Fahrzeugstatistiken
 
 Anzeigeoptionen:
@@ -71,38 +39,7 @@ Anzeigeoptionen:
 
 Standard-Eingabebindungen:
 Left Ctrl + Left Alt + Num Pad 9 : Konfigurationsdatei von der Festplatte neu laden
-Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten
-
-Changelog:
-v1.0.2.5 :
- - Trap für Fahrtrichtung hinzufügen nicht unterstützt
-v1.0.2.4 :
- - Fahrtrichtung zur Geschwindigkeitsanzeige hinzufügen
- - Hinzufügen der Option zur Anzeige, auch wenn das HUD ausgeblendet ist
-v1.0.2.3 :
- - Zahlen mit Lokalisierung formatieren
- - Reparieren Sie die Anzeige oben links, damit sie mit Precision Farming kompatibel ist.
- - Option zum Umrechnen von Einheiten für die Anzeige hinzufügen
- - Hinzufügen der Option Beacon Light Anzeige
- - Inspektor ausblenden, wenn über der Karte positioniert und der Chat angezeigt wird (MP)
-v1.0.2.0 :
- - CoursePlay und AutoDrive Restzeitanzeige hinzufügen
-v1.0.1.10 (since 1.0.0.0) :
- - Fix für fehlende Füllstandsinformationen bei rechtsbündigen Anzeigen.
- - Hinzufügen einer Schadensanzeige (standardmäßig, wenn Traktor oder Anbaugerät zu 80% beschädigt ist)
- - Hinzufügen von CoursePlay und AutoDrive AI-Erkennung
- - Förderbänder ausblenden, da sie keine nützlichen Informationen liefern.
- - Option hinzufügen, um Feldnummern unter 10 mit Nullen zu versehen
- - Fettgedruckten Text optional machen
- - Benutzernamen für kontrollierte Fahrzeuge hinzufügen.
- - Berechnung des Füllungsgrades mit maxMass berücksichtigt, wenn möglich
- - Optionale alphabetische Sortierung der Liste hinzufügen (ansonsten wird die Kauf-/Tab-Reihenfolge verwendet)
- - Multiplayer-Farmbewusstsein hinzufügen - Filterung nur auf die eigene Farm oder auf alle Farmen erlauben
- - Option zum Ändern der Textgröße in den Einstellungen hinzufügen, Laden der Textgröße aus xml korrigieren
- - Zusätzliche Funktion: benutzerdefinierte Reihenfolge pro Zeile
- - Unterstützung für Advanced Farm Manager hinzufügen
- - DEF-Stufe hinzufügen (optional, standardmäßig ausgeschaltet)
-]]></de>
+Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten]]></de>
     </description>
     <author>JTSage</author>
     <version>1.0.2.5</version>

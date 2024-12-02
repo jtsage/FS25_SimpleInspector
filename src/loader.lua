@@ -1,6 +1,6 @@
 -- Loader for SimpleInspector
 
-local debug        = false
+local debug        = true
 local modDirectory = g_currentModDirectory or ""
 local modName      = g_currentModName or "unknown"
 local modEnvironment
@@ -12,7 +12,7 @@ source(g_currentModDirectory .. 'lib/fs22SimpleUtils.lua')
 local function load(mission)
 	assert(g_simpleInspector == nil)
 
-	local siLoggeer = FS22Log:new(
+	local siLogger = FS22Log:new(
 		"simpleInspector",
 		debug and FS22Log.DEBUG_MODE.VERBOSE or FS22Log.DEBUG_MODE.WARNINGS,
 		{
@@ -23,7 +23,7 @@ local function load(mission)
 		}
 	)
 
-	modEnvironment = SimpleInspector:new(mission, modDirectory, modName, siLoggeer)
+	modEnvironment = SimpleInspector:new(mission, modDirectory, modName, siLogger)
 
 	getfenv(0)["g_simpleInspector"] = modEnvironment
 
@@ -55,7 +55,7 @@ local function init()
 	Mission00.load           = Utils.prependedFunction(Mission00.load, load)
 	Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, startMission)
 
-	InGameMenuGeneralSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuGeneralSettingsFrame.onFrameOpen, SimpleInspector.initGui)
+	InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameOpen, SimpleInspector.initGui)
 
 	FSCareerMissionInfo.saveToXMLFile = Utils.appendedFunction(FSCareerMissionInfo.saveToXMLFile, save)
 end

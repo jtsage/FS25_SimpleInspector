@@ -92,6 +92,32 @@
 		"Farm",
 		"g_sleepManager",
 		"FSDensityMapUtil",
-		"getCenterOfMass"
+		"getCenterOfMass",
+		"source",
+		"FS22Log",
+		"SimpleInspector",
+		"FS22FSGUnits",
+		"FS22PrefSaver",
+		"g_baseHUDFilename",
+		"HUD",
+		"g_overlayManager",
+		"JTSUtil",
+		"g_inGameMenu",
+		"localDirectionToWorld",
+		"printError",
+		"printWarning",
+		"FSCareerMissionInfo",
+		"InGameMenuSettingsFrame"
+	],
+	"cSpell.words": [
+		"allfarms",
+		"DEVEL",
+		"disp",
+		"ELECTRICCHARGE",
+		"filltype",
+		"getfenv",
+		"ingame",
+		"precendence",
+		"Seperator"
 	]
 }

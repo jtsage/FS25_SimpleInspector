@@ -85,8 +85,8 @@
 --  * FS22Log.SEARCH.BOTH            - Search both keys and values
 --  * FS22Log.SEARCH.KEYS_AND_VALUES - Search both keys and values
 --
--- (c)JTSage Modding & FSG Modding.  You may reuse or alter this code to your needs as nessesary with
--- no prior permission.  No warrenty implied or otherwise.
+-- (c)JTSage Modding & FSG Modding.  You may reuse or alter this code to your needs as necessary with
+-- no prior permission.  No warranty implied or otherwise.
 
 FS22Log = {}
 

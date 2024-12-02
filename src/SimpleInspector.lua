@@ -110,7 +110,7 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.setValueTimerFrequency = 15
 	self.inspectText            = {}
 	self.boxBGColor             = { 544, 20, 200, 44 }
-	self.bgName                 = 'dataS/menu/blank.png'
+	self.bgName                 = g_baseHUDFilename
 	self.menuTextSizes          = { 8, 10, 12, 14, 16, 18, 20 }
 
 	local modDesc       = loadXMLFile("modDesc", modDirectory .. "modDesc.xml");
@@ -121,6 +121,7 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 
 	self.shown_farms_mp = 0
 
+	-- cSpell: disable
 	self.fill_invert_all = {
 		fertilizingcultivatorroller    = true,
 		manuretrailer                  = true,
@@ -153,6 +154,7 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		[FillType.LIQUIDFERTILIZER] = true,
 		[FillType.HERBICIDE]        = true
 	}
+	-- cSpell: enable
 
 	self.STATUS            = {}
 	self.STATUS.RUNNING    = 3
@@ -167,7 +169,7 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		[self.STATUS.OFF]        = "colorNormal"
 	}
 
-	self.BEACON_PERC = {
+	self.BEACON_PERCENT = {
 		[0] = 100,
 		[1] = 98,
 		[2] = 96,
@@ -191,6 +193,17 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		[8] = g_i18n:getText('unit_fsgDirection_N'),
 	}
 
+  -- Setup the background
+  local colorBackground = HUD.COLOR.BACKGROUND
+  local r, g, b, a = unpack(colorBackground)
+  self.bgScale = g_overlayManager:createOverlay("gui.gameInfo_middle", 0, 0, 0, 0)
+  self.bgScale:setColor(r, g, b, a)
+  self.bgLeft = g_overlayManager:createOverlay("gui.gameInfo_left", 0, 0, 0, 0)
+  self.bgLeft:setColor(r, g, b, a)
+  self.bgRight = g_overlayManager:createOverlay("gui.gameInfo_right", 0, 0, 0, 0)
+  self.bgRight:setColor(r, g, b, a)
+  self.icons = {}
+
 	self.logger:print(":new() Initialized", FS22Log.LOG_LEVEL.VERBOSE, "method_track")
 
 	return self
@@ -206,7 +219,7 @@ function SimpleInspector:openConstructionScreen()
 end
 
 function SimpleInspector:getAllDamage(vehicle )
-	-- This is not recusive.  It checks the tractor, and immediate implements only.
+	-- This is not recursive.  It checks the tractor, and immediate implements only.
 	-- Shortcut method, first damage above threshold returns true.
 	if self:getDamageBad(vehicle) then return true end
 
@@ -371,8 +384,8 @@ function SimpleInspector:getDirection(vehicle)
 	local realRotation     = math.deg(-yRot % (2 * math.pi))
 	local realRotationIdx  = MathUtil.round(realRotation / 45)
 	local realRotationText = self.COMPASS[realRotationIdx]
-	local realDirection    = vehicle.getDrivngDirection ~= nil and vehicle:getDrivingDirection() or 0
-	local driveDirection   = realDirection == -1 and "↓" or realDirection == 1 and "↑" or "" -- forawrd = 1, reverse = -1, not moving = 0
+	local realDirection    = vehicle.getDrivingDirection ~= nil and vehicle:getDrivingDirection() or 0
+	local driveDirection   = realDirection == -1 and "↓" or realDirection == 1 and "↑" or "" -- forward = 1, reverse = -1, not moving = 0
 
 	return realRotationText .. driveDirection
 end
@@ -427,7 +440,7 @@ function SimpleInspector:getSingleFill(vehicle, theseFills)
 				elseif maxMatters and fillLevel > 0 then
 					-- adjust capacity for max weight (must have a fillLevel)
 					if ( math.huge ~= vehicle.maxComponentMass ) then
-						-- if max is infinity, just use stated capactiy
+						-- if max is infinity, just use stated capacity
 						local fillTypeDesc  = g_fillTypeManager:getFillTypeByIndex(fillType)
 
 						-- get the weight available to fill
@@ -478,12 +491,12 @@ function SimpleInspector:updateVehicles()
 
 	self.shown_farms_mp  = 0
 
-	if g_currentMission ~= nil and g_currentMission.vehicles ~= nil then
+	if g_currentMission ~= nil and g_currentMission.vehicleSystem.vehicles ~= nil then
 
 		local sortOrder = {}
 
-		for v=1, #g_currentMission.vehicles do
-			local thisVeh    = g_currentMission.vehicles[v]
+		for v=1, #g_currentMission.vehicleSystem.vehicles do
+			local thisVeh    = g_currentMission.vehicleSystem.vehicles[v]
 			local thisFarmID = 0
 
 			if ( self.isMPGame ) then
@@ -512,7 +525,7 @@ function SimpleInspector:updateVehicles()
 		local lastFarmID = -1
 
 		for _, sortEntry in ipairs(sortOrder) do
-			local thisVeh     = g_currentMission.vehicles[sortEntry.idx]
+			local thisVeh     = g_currentMission.vehicleSystem.vehicles[sortEntry.idx]
 			local thisVehFarm = g_farmManager:getFarmById(sortEntry.farmID)
 
 			if thisVeh ~= nil and thisVeh.getIsControlled ~= nil then
@@ -528,7 +541,7 @@ function SimpleInspector:updateVehicles()
 					local isConned  = thisVeh.getIsControlled ~= nil   and thisVeh:getIsControlled()
 
 					if ( self.settings:getValue("isEnabledShowAll") or isConned or isRunning or isOnAI ) then
-						local plyrName  = self.isMPGame and self.settings:getValue("isEnabledShowPlayer") and isConned and thisVeh.getControllerName ~= nil and thisVeh:getControllerName() or nil
+						local playerName  = self.isMPGame and self.settings:getValue("isEnabledShowPlayer") and isConned and thisVeh.getControllerName ~= nil and thisVeh:getControllerName() or nil
 						local AFMHotKey = thisVeh.getHotKeyVehicleState ~= nil and thisVeh:getHotKeyVehicleState() or 0
 						local fullName  = thisVeh:getFullName()
 						local speed     = self:getSpeed(thisVeh)
@@ -560,7 +573,7 @@ function SimpleInspector:updateVehicles()
 							status = self.STATUS.RUNNING
 						end
 						if isOnAI then
-							-- second highest precendence
+							-- second highest precedence
 							status = self.STATUS.AI
 
 							-- default text, override for AD & CP below.
@@ -630,7 +643,7 @@ function SimpleInspector:updateVehicles()
 							fills     = fills,
 							isOnField = isOnField,
 							isBroken  = isBroken,
-							plyrName  = plyrName,
+							playerName  = playerName,
 							farmInfo  = { farmID = sortEntry.farmID, farmName = thisVehFarm.name, farmColor = Farm.COLORS[thisVehFarm.color]}
 						})
 					end
@@ -649,30 +662,31 @@ function SimpleInspector:draw()
 		return
 	end
 
-	if self.inspectBox ~= nil then
+	if self.bgScale ~= nil and self.bgLeft ~= nil and self.bgRight ~= nil then
 		local info_text = self.display_data
 		local overlayH, dispTextH, dispTextW = 0, 0, 0
 		local outputTextLines = {}
 
 		if #info_text == 0 or not self.settings:getValue("isEnabledVisible") or g_sleepManager:getIsSleeping() then
 			-- we have no entries, hide the overlay and leave
-			self.inspectBox:setVisible(false)
+			-- self.inspectBox:setVisible(false)
 			return
 		elseif not self.settings:getValue("isEnabledWhenHUDHidden") and ( g_noHudModeEnabled or not g_currentMission.hud.isVisible ) then
 			-- HUD is hidden, and we respect that
-			self.inspectBox:setVisible(false)
+			-- self.inspectBox:setVisible(false)
 			return
-		elseif g_gameSettings:getValue("ingameMapState") == 4 and self.settings:getValue("displayMode") % 2 ~= 0 and g_currentMission.inGameMenu.hud.inputHelp.overlay.visible then
+		elseif g_gameSettings:getValue("ingameMapState") == 4 and self.settings:getValue("displayMode") % 2 ~= 0 and g_currentMission.hud.inputHelp:getVisible() then
 			-- Left side display hide on big map with help open
-			self.inspectBox:setVisible(false)
+			-- self.inspectBox:setVisible(false)
 			return
-		elseif self.settings:getValue("displayMode") == 3 and g_currentMission.hud.chatWindow.overlay.visible then
+		elseif self.settings:getValue("displayMode") == 3 and g_currentMission.hud.chatDisplay:getVisible() then
 			-- Over map display and chat is visible, so hide.
-			self.inspectBox:setVisible(false)
+			-- self.inspectBox:setVisible(false)
 			return
 		else
 			-- we have entries, lets get the overall height of the box and unhide
-			self.inspectBox:setVisible(true)
+			-- self.inspectBox:setVisible(true)
+
 			dispTextH = (self.inspectText.size * #info_text) + (self.inspectText.size * self.shown_farms_mp)
 			overlayH  = dispTextH + ( 2 * self.inspectText.marginHeight)
 		end
@@ -726,7 +740,7 @@ function SimpleInspector:draw()
 
 		local lastFarmID = -1
 		local beaconFrame = g_updateLoopIndex % 10
-		local beaconColor = JTSUtil.colorPercent(self.BEACON_PERC[beaconFrame], true)
+		local beaconColor = JTSUtil.colorPercent(self.BEACON_PERCENT[beaconFrame], true)
 
 		for _, thisEntry in pairs(info_text) do
 
@@ -748,11 +762,11 @@ function SimpleInspector:draw()
 			end
 
 			for _, dispElement in pairs(displayOrderTable) do
-				local doAddSeperator = false
+				local doAddSeparator = false
 
 				if dispElement:sub(1,3) == "SPD" and self.settings:getValue("isEnabledShowSpeed") then
 					-- Vehicle speed
-					doAddSeperator = true
+					doAddSeparator = true
 
 					JTSUtil.dispStackAdd(
 						outputTextLines,
@@ -767,7 +781,7 @@ function SimpleInspector:draw()
 
 				if dispElement:sub(1,3) == "GAS" and self.settings:getValue("isEnabledShowFuel") and thisEntry.fuelLevel ~= nil then
 					-- Vehicle fuel { color, text, fuelLevel, defLevel }
-					doAddSeperator = true
+					doAddSeparator = true
 
 					JTSUtil.dispStackAdd(
 						outputTextLines,
@@ -802,7 +816,7 @@ function SimpleInspector:draw()
 
 				if dispElement:sub(1,3) == "DAM" and self.settings:getValue("isEnabledShowDamage") and thisEntry.isBroken then
 					-- Damage marker tag
-					doAddSeperator = true
+					doAddSeparator = true
 					JTSUtil.dispStackAdd(
 						outputTextLines,
 						self.settings:getValue("setStringTextDamaged"),
@@ -812,7 +826,7 @@ function SimpleInspector:draw()
 
 				if dispElement:sub(1,3) == "FLD" and self.settings:getValue("isEnabledShowField") and thisEntry.isOnField.fieldOn then
 					-- Field mark isOnField.{fieldOn = false, fieldNum = 0}
-					doAddSeperator = true
+					doAddSeparator = true
 
 					local fieldNum = self.settings:getValue("isEnabledPadFieldNum") and string.format('%02d', thisEntry.isOnField.fieldNum) or thisEntry.isOnField.fieldNum
 
@@ -825,7 +839,7 @@ function SimpleInspector:draw()
 
 				if dispElement:sub(1,3) == "AIT" and thisEntry.isAI.aiActive then
 					-- AI Tag isAI.{aiActive = false, aiText = ""}
-					doAddSeperator = true
+					doAddSeparator = true
 					JTSUtil.dispStackAdd(
 						outputTextLines,
 						thisEntry.isAI.aiText,
@@ -833,19 +847,19 @@ function SimpleInspector:draw()
 					)
 				end
 
-				if dispElement:sub(1,3) == "USR" and thisEntry.plyrName then
+				if dispElement:sub(1,3) == "USR" and thisEntry.playerName then
 					-- User name
-					doAddSeperator = true
+					doAddSeparator = true
 					JTSUtil.dispStackAdd(
 						outputTextLines,
-						JTSUtil.qConcat("[", thisEntry.plyrName, "]"),
+						JTSUtil.qConcat("[", thisEntry.playerName, "]"),
 						self:getNamedColor("colorUser")
 					)
 				end
 
 				-- Vehicle name
 				if dispElement:sub(1,3) == "VEH" then
-					doAddSeperator = true
+					doAddSeparator = true
 					JTSUtil.dispStackAdd(
 						outputTextLines,
 						thisEntry.fullName,
@@ -857,9 +871,9 @@ function SimpleInspector:draw()
 					for fillTypeIndex, fillTypeInfo in pairs(thisEntry.fills) do
 						-- fillTypeInfo.{ level = fillLevel, capacity = capacity, reverse = isInverted }
 
-						doAddSeperator = true
+						doAddSeparator = true
 
-						-- Seperator between fill types / vehicle
+						-- Separator between fill types / vehicle
 						JTSUtil.dispStackAdd(
 							outputTextLines,
 							self.settings:getValue("setStringTextSep"),
@@ -896,7 +910,7 @@ function SimpleInspector:draw()
 					end
 				end
 
-				if dispElement == "SEP" or ( dispElement:sub(-1) == "*" and doAddSeperator ) then
+				if dispElement == "SEP" or ( dispElement:sub(-1) == "*" and doAddSeparator ) then
 					-- Seperator (or Element with star)
 					JTSUtil.dispStackAdd(
 						outputTextLines,
@@ -905,7 +919,7 @@ function SimpleInspector:draw()
 					)
 				end
 
-				if dispElement:sub(-1) == "-" and doAddSeperator then
+				if dispElement:sub(-1) == "-" and doAddSeparator then
 					-- Extra space
 					JTSUtil.dispStackAdd(
 						outputTextLines,
@@ -942,14 +956,35 @@ function SimpleInspector:draw()
 			if tmpW > dispTextW then dispTextW = tmpW end
 		end
 
+    local displayX = 0
+    local displayY = 0
+
 		-- update overlay background
 		if self.settings:getValue("displayMode") % 2 == 0 then
-			self.inspectBox.overlay:setPosition(overlayX - ( dispTextW + ( 2 * self.inspectText.marginWidth ) ), overlayY)
+			displayX = overlayX - ( dispTextW + ( 2 * self.inspectText.marginWidth ) )
+      displayY = overlayY
 		else
-			self.inspectBox.overlay:setPosition(overlayX, overlayY)
+			displayX = overlayX
+      displayY = overlayY
 		end
 
-		self.inspectBox.overlay:setDimension(dispTextW + (self.inspectText.marginWidth * 2), overlayH)
+    -- Set background dimensions dynamically based on text width
+    local padding = 0.005 -- Add some padding
+    local bgWidth = dispTextW + (self.inspectText.marginWidth * 2)
+    local bgHeight = overlayH
+
+    self.bgScale:setDimension(bgWidth, bgHeight)
+    self.bgScale:setPosition(displayX, displayY)
+    self.bgScale:render()
+
+    -- Render left and right parts of the background (optional)
+    self.bgLeft:setDimension(padding, bgHeight)
+    self.bgLeft:setPosition(displayX - padding, displayY)
+    self.bgLeft:render()
+
+    self.bgRight:setDimension(padding, bgHeight)
+    self.bgRight:setPosition(displayX + bgWidth, displayY)
+    self.bgRight:render()
 
 		-- reset text render to "defaults" to be kind
 		setTextColor(1,1,1,1)
@@ -965,7 +1000,7 @@ function SimpleInspector:update(dt)
 	end
 
 	if g_updateLoopIndex % self.setValueTimerFrequency == 0 then
-		-- Lets not be rediculous, only update the vehicles "infrequently"
+		-- Lets not be ridiculous, only update the vehicles "infrequently"
 		self:updateVehicles()
 	end
 end
@@ -1002,7 +1037,10 @@ function SimpleInspector:onStartMission(mission)
 
 	self.logger:print(":onStartMission()", FS22Log.LOG_LEVEL.VERBOSE, "method_track")
 
-	self:createTextBox()
+	-- self:createTextBox()
+	self.marginWidth, self.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({ 8, 8 })
+	self.inspectText.marginWidth, self.inspectText.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({self.settings:getValue("setValueTextMarginX"), self.settings:getValue("setValueTextMarginY")})
+	self.inspectText.size = self.gameInfoDisplay:scalePixelToScreenHeight(self.settings:getValue("setValueTextSize"))
 end
 
 function SimpleInspector:findOrigin()
@@ -1025,9 +1063,9 @@ function SimpleInspector:findOrigin()
 		-- bottom right display
 		tmpX = 1
 		tmpY = 0.01622
-		if g_currentMission.inGameMenu.hud.speedMeter.overlay.visible then
-			tmpY = tmpY + self.speedMeterDisplay:getHeight() + 0.032
-			if g_modIsLoaded["FS22_EnhancedVehicle"] or g_modIsLoaded["FS22_guidanceSteering"] then
+		if g_inGameMenu.hud.speedMeter.isVisible then
+			tmpY = tmpY + g_inGameMenu.hud.speedMeter.bgScale.height + 0.032
+			if g_modIsLoaded["FS25_EnhancedVehicle"] or g_modIsLoaded["FS25_guidanceSteering"] then
 				tmpY = tmpY + 0.03
 			end
 		end
@@ -1038,10 +1076,10 @@ function SimpleInspector:findOrigin()
 		-- top left display
 		tmpX = 0.014
 		tmpY = 0.945
-		if g_currentMission.inGameMenu.hud.inputHelp.overlay.visible then
+		if g_inGameMenu.hud.inputHelp.isVisible then
 			tmpY = tmpY - self.inputHelpDisplay:getHeight() - 0.012
 		else
-			if g_currentMission.controlledVehicle ~= nil and _G['FS22_precisionFarming'] ~= nil then
+			if g_currentMission.hud.controlledVehicle ~= nil and _G['FS22_precisionFarming'] ~= nil then
 				for idx, extension in ipairs(self.mission.hud.inputHelp.vehicleHudExtensions) do
 					if extension.extendedSowingMachine ~= nil then
 						tmpY = tmpY - (Utils.getNoNil(extension.displayHeight , 0) + 0.012)
@@ -1062,25 +1100,35 @@ function SimpleInspector:createTextBox()
 
 	local baseX, baseY = self:findOrigin()
 
-	local boxOverlay = nil
+  local bgPosY = baseY
 
 	self.marginWidth, self.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({ 8, 8 })
 
-	if ( self.settings:getValue("displayMode") % 2 == 0 ) then -- top right
-		boxOverlay = Overlay.new(self.bgName, baseX, baseY - self.marginHeight, 1, 1)
-	else -- default to 1
-		boxOverlay = Overlay.new(self.bgName, baseX, baseY + self.marginHeight, 1, 1)
-	end
 
-	local boxElement = HUDElement.new(boxOverlay)
+	-- Set background dimensions dynamically based on text width
+	local padding = 0.005 -- Add some padding around the text
+	local bgWidth = (self.inspectText.size + padding * 2)
+	local bgHeight = 0.02 -- Fixed height for the background
 
-	self.inspectBox = boxElement
+	-- Set location and render the background
+	local bgPosX = baseX - bgWidth * 0.5
 
-	self.inspectBox:setUVs(GuiUtils.getUVs(self.boxBGColor))
-	self.inspectBox:setColor(unpack(SpeedMeterDisplay.COLOR.GEARS_BG))
-	self.inspectBox:setVisible(false)
-	self.gameInfoDisplay:addChild(boxElement)
+  if ( self.settings:getValue("displayMode") % 2 == 0 ) then -- top right
+  	bgPosY = baseY - self.marginHeight
+  else
+    bgPosY = baseY + self.marginHeight
+  end
 
+	self.bgScale:setDimension(bgWidth, bgHeight)
+	self.bgScale:setPosition(bgPosX, bgPosY)
+	
+	-- Render left and right parts of the background (optional)
+	self.bgLeft:setDimension(padding, bgHeight)
+	self.bgLeft:setPosition(bgPosX - padding, bgPosY)
+	
+	self.bgRight:setDimension(padding, bgHeight)
+	self.bgRight:setPosition(bgPosX + bgWidth, bgPosY)
+  
 	self.inspectText.marginWidth, self.inspectText.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({self.settings:getValue("setValueTextMarginX"), self.settings:getValue("setValueTextMarginY")})
 	self.inspectText.size = self.gameInfoDisplay:scalePixelToScreenHeight(self.settings:getValue("setValueTextSize"))
 end
@@ -1105,28 +1153,28 @@ function SimpleInspector:registerActionEvents()
 end
 
 function SimpleInspector:actionReloadConfig()
-	local thisModEnviroment = getfenv(0)["g_simpleInspector"]
+	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
-	thisModEnviroment.logger:print("force reload settings", FS22Log.LOG_LEVEL.INFO, "user_info")
+	thisModEnvironment.logger:print("force reload settings", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnviroment.settings:loadSettings()
+	thisModEnvironment.settings:loadSettings()
 end
 
 function SimpleInspector:actionToggleAllFarms()
-	local thisModEnviroment = getfenv(0)["g_simpleInspector"]
+	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
-	thisModEnviroment.logger:print("toggle all farms", FS22Log.LOG_LEVEL.INFO, "user_info")
+	thisModEnvironment.logger:print("toggle all farms", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnviroment.settings:setValue("isEnabledShowUnowned", not thisModEnviroment.settings:getValue("isEnabledShowUnowned"))
-	thisModEnviroment.settings:saveSettings()
+	thisModEnvironment.settings:setValue("isEnabledShowUnowned", not thisModEnvironment.settings:getValue("isEnabledShowUnowned"))
+	thisModEnvironment.settings:saveSettings()
 end
 
 function SimpleInspector:actionToggleVisible()
-	local thisModEnviroment = getfenv(0)["g_simpleInspector"]
-	thisModEnviroment.logger:print("toggle display", FS22Log.LOG_LEVEL.INFO, "user_info")
+	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
+	thisModEnvironment.logger:print("toggle display", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnviroment.settings:setValue("isEnabledVisible", not thisModEnviroment.settings:getValue("isEnabledVisible"))
-	thisModEnviroment.settings:saveSettings()
+	thisModEnvironment.settings:setValue("isEnabledVisible", not thisModEnvironment.settings:getValue("isEnabledVisible"))
+	thisModEnvironment.settings:saveSettings()
 end
 
 
@@ -1136,13 +1184,15 @@ function SimpleInspector.addMenuOption(original, target, id, i18n_title, i18n_to
 	menuOption.target = target
 	menuOption.id     = id
 
-	menuOption:setCallback("onClickCallback", callback)
-	menuOption:setDisabled(false)
+	menuOption.elements[1].target = target
+	menuOption.elements[1].id = id
+	menuOption.elements[1]:setCallback("onClickCallback", callback)
+	menuOption.elements[1]:setDisabled(false)
 
-	local settingTitle = menuOption.elements[4]
-	local toolTip      = menuOption.elements[6]
+	local settingTitle = menuOption.elements[2]
+	local toolTip      = menuOption.elements[1].elements[1]
 
-	menuOption:setTexts({unpack(options)})
+	menuOption.elements[1]:setTexts({unpack(options)})
 	settingTitle:setText(g_i18n:getText(i18n_title))
 	toolTip:setText(g_i18n:getText(i18n_tooltip))
 
@@ -1164,13 +1214,14 @@ function SimpleInspector.initGui(self)
 		-- Create controls -- Skip if we've already done this once
 		g_simpleInspector.createdGUI = true
 
-		local title = TextElement.new()
-		title:applyProfile("settingsMenuSubtitle", true)
-		title:setText(g_i18n:getText("title_simpleInspector"))
-		self.boxLayout:addElement(title)
+		local menuTitle = self.generalSettingsLayout.elements[7]:clone()
+		menuTitle:setText(g_i18n:getText("title_simpleInspector"))
+		self.generalSettingsLayout:addElement(menuTitle)
+
+		g_simpleInspector.logger:printVariable(self.generalSettingsLayout.elements[8], FS22Log.LOG_LEVEL.VERBOSE, "menu_item_8", 3)
 
 		self.menuOption_DisplayMode = SimpleInspector.addMenuOption(
-			self.checkInvertYLook,
+			self.generalSettingsLayout.elements[8],
 			g_simpleInspector,
 			"simpleInspector_DisplayMode",
 			"setting_simpleInspector_DisplayMode",
@@ -1183,7 +1234,9 @@ function SimpleInspector.initGui(self)
 			},
 			"onMenuOptionChanged_DisplayMode"
 		)
-		self.boxLayout:addElement(self.menuOption_DisplayMode)
+		self.generalSettingsLayout:addElement(self.menuOption_DisplayMode)
+
+		g_simpleInspector.logger:printVariable(self.menuOption_DisplayMode, FS22Log.LOG_LEVEL.VERBOSE, "displayMode", 3)
 
 		for _, thisOptionName in ipairs(unitOptions) do
 			-- Boolean style options
@@ -1197,7 +1250,7 @@ function SimpleInspector.initGui(self)
 			local theseOptions    = g_simpleInspector.convert:getSettingsTexts(unitType)
 
 			self[thisFullOptName] = SimpleInspector.addMenuOption(
-				self.checkInvertYLook,
+				self.generalSettingsLayout.elements[8],
 				g_simpleInspector,
 				"simpleInspector_" .. thisOptionName,
 				"setting_simpleInspector_" .. thisOptionName,
@@ -1205,7 +1258,7 @@ function SimpleInspector.initGui(self)
 				theseOptions,
 				"onMenuOptionChanged_unitOpt"
 			)
-			self.boxLayout:addElement(self[thisFullOptName])
+			self.generalSettingsLayout:addElement(self[thisFullOptName])
 		end
 
 
@@ -1213,7 +1266,7 @@ function SimpleInspector.initGui(self)
 			-- Boolean style options
 			local thisFullOptName = "menuOption_" .. thisOptionName
 			self[thisFullOptName] = SimpleInspector.addMenuOption(
-				self.checkInvertYLook,
+				self.generalSettingsLayout.elements[1],
 				g_simpleInspector,
 				"simpleInspector_" .. thisOptionName,
 				"setting_simpleInspector_" .. thisOptionName,
@@ -1224,7 +1277,7 @@ function SimpleInspector.initGui(self)
 				},
 				"onMenuOptionChanged_boolOpt"
 			)
-			self.boxLayout:addElement(self[thisFullOptName])
+			self.generalSettingsLayout:addElement(self[thisFullOptName])
 		end
 
 		local textSizeTexts = {}
@@ -1233,7 +1286,7 @@ function SimpleInspector.initGui(self)
 		end
 
 		self.menuOption_TextSize = SimpleInspector.addMenuOption(
-			self.checkInvertYLook,
+			self.generalSettingsLayout.elements[8],
 			g_simpleInspector,
 			"simpleInspector_setValueTextSize",
 			"setting_simpleInspector_TextSize",
@@ -1241,18 +1294,18 @@ function SimpleInspector.initGui(self)
 			textSizeTexts,
 			"onMenuOptionChanged_setValueTextSize"
 		)
-		self.boxLayout:addElement(self.menuOption_TextSize)
+		self.generalSettingsLayout:addElement(self.menuOption_TextSize)
 	end
 
 	-- Set Current Values
-	self.menuOption_DisplayMode:setState(g_simpleInspector.settings:getValue("displayMode"))
-	self.menuOption_SolidUnit:setState(g_simpleInspector.settings:getValue("isEnabledSolidUnit"))
-	self.menuOption_LiquidUnit:setState(g_simpleInspector.settings:getValue("isEnabledLiquidUnit"))
+	self.menuOption_DisplayMode.elements[1]:setState(g_simpleInspector.settings:getValue("displayMode"))
+	self.menuOption_SolidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledSolidUnit"))
+	self.menuOption_LiquidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledLiquidUnit"))
 
 	for _, thisOption in ipairs(boolMenuOptions) do
 		local thisMenuOption = "menuOption_" .. thisOption
 		local thisRealOption = "isEnabled" .. thisOption
-		self[thisMenuOption]:setIsChecked(g_simpleInspector.settings:getValue(thisRealOption))
+		self[thisMenuOption].elements[1]:setIsChecked(g_simpleInspector.settings:getValue(thisRealOption))
 	end
 
 	local textSizeState = 3 -- backup value for it set odd in the xml.
@@ -1261,7 +1314,11 @@ function SimpleInspector.initGui(self)
 			textSizeState = idx
 		end
 	end
-	self.menuOption_TextSize:setState(textSizeState)
+	self.menuOption_TextSize.elements[1]:setState(textSizeState)
+
+	-- Refresh the menu so new buttons show
+	self.generalSettingsLayout:invalidateLayout()
+	self:updateGameSettings()
 end
 
 function SimpleInspector:onMenuOptionChanged_setValueTextSize(state)
@@ -1271,6 +1328,8 @@ function SimpleInspector:onMenuOptionChanged_setValueTextSize(state)
 end
 
 function SimpleInspector:onMenuOptionChanged_DisplayMode(state)
+	print("~~ display mode " .. state .. ":")
+	self.logger:printVariable(self.settings, FS22Log.LOG_LEVEL.VERBOSE, "settingsDump")
 	self.settings:setValue("displayMode", state)
 	self.settings:saveSettings()
 end
@@ -1284,9 +1343,11 @@ function SimpleInspector:onMenuOptionChanged_boolOpt(state, info)
 end
 
 function SimpleInspector:onMenuOptionChanged_unitOpt(state, info)
+	print("~~ " .. state .. ":" .. info.id)
 	self.settings:setValue(
 		"isEnabled" .. string.sub(info.id, (#"simpleInspector_"+1)),
 		state
 	)
 	self.settings:saveSettings()
 end
+
