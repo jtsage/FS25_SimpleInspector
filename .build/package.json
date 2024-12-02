@@ -1,0 +1,15 @@
+{
+  "name": "fs-mod-builder",
+  "version": "1.0.0",
+  "main": "makeZip.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "glob": "^11.0.0"
+  }
+}

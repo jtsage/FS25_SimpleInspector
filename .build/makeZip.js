@@ -8,7 +8,7 @@
 ------------------------------------------------------
 */
 
-const zipName = "FS22_SimpleInspector"
+const zipName = "FS25_SimpleInspector"
 
 const glob   = require("glob")
 const path   = require('path');
@@ -16,7 +16,8 @@ const AdmZip = require("adm-zip");
 const fs     = require('fs')
 
 const filesToAdd = glob.sync("../src/**", {nodir: true})
-const zipPath    = "../" + zipName + ".zip"
+const zipPath    = path.join("../" + zipName + ".zip")
+const zipPathUp  = path.join("../" + zipName + "_update.zip")
 
 console.log("Refreshing ZIP File...")
 
@@ -34,8 +35,10 @@ filesToAdd.forEach((file) => {
 if ( fs.existsSync(zipPath)) {
 	console.log("  Removing Stale ZIP file")
 	fs.rmSync(zipPath)
+	fs.rmSync(zipPathUp)
 }
 
-console.log("  Writing New ZIP File")
-zip.writeZip("../" + zipName + ".zip")
+console.log("  Writing New ZIP File (and update)")
+zip.writeZip(zipPath)
+fs.copyFileSync(zipPath, zipPathUp)
 console.log("Done.")

@@ -8,7 +8,7 @@
         <en><![CDATA[Simple Inspector shows a HUD overlay with vehicle statistics
 
 Display Options:
- - 4 on screen placement locations - each corner of the display
+ - 2 on screen placement locations - left hand corners of the display
  - Just your vehicles or all vehicles
  - Speed of vehicles
  - Fuel level of vehicles
@@ -25,7 +25,7 @@ Left Alt + Num Pad 9 : Toggle HUD Visibility]]></en>
         <de><![CDATA[Einfacher Inspektor zeigt ein HUD-Overlay mit Fahrzeugstatistiken
 
 Anzeigeoptionen:
- - 4 Platzierungsorte auf dem Bildschirm 
+ - 2 Positionen für die Platzierung auf dem Bildschirm - linke Ecken des Bildschirms 
  - jede Ecke der Anzeige 
  - nur Ihre Fahrzeuge oder alle Fahrzeuge 
  - Geschwindigkeit der Fahrzeuge 
@@ -42,8 +42,8 @@ Left Ctrl + Left Alt + Num Pad 9 : Konfigurationsdatei von der Festplatte neu la
 Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten]]></de>
     </description>
     <author>JTSage</author>
-    <version>1.0.2.5</version>
-    <iconFilename>modIcon.dds</iconFilename>
+    <version>1.0.0.0</version>
+    <iconFilename>icon_simpleinspector.dds</iconFilename>
     <multiplayer supported="true"/>
     <extraSourceFiles>
         <sourceFile filename="loader.lua"/>
