@@ -3,7 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/jtsage/FS25_SimpleInspector) ![GitHub all releases](https://img.shields.io/github/downloads/jtsage/FS25_SimpleInspector/total)
 
 <p align="left">
-  <img src="https://github.com/jtsage/FS25_simpleInspector/raw/main/icon_simpleinspector.png" alt="">
+  <img src="icon_simpleinspector.png" alt="">
 </p>
 
 Spiritual ripoff of VehicleInspector - pared down to what I need/want
@@ -123,5 +123,5 @@ Default: `SPD_SEP_GAS_SEP_DAM*_FLD*_AIT*_USR-_VEH_FIL`
 ## Sample
 
 <p align="center">
-  <img width="650" src="https://github.com/jtsage/FS25_simpleInspector/raw/modHub_screenshots/002_sshot_overview_multi_mode.png" alt="">
+  <img width="650" src="modHub_screenshots/001_sshot_closeup.png" alt="">
 </p>
