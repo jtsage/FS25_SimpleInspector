@@ -285,39 +285,12 @@ function SimpleInspector:getIsOnField(vehicle)
 		end
 
 		local farmlandId = g_farmlandManager:getFarmlandIdAtWorldPosition(wx, wz)
-		if farmlandId ~= nil then
 
-			local foundField = false
-
-			for f=1, #g_fieldManager.fields do
-
-				if foundField then break end
-
-				local field = g_fieldManager.fields[f]
-
-				if field ~= nil and field.farmland ~= nil and field.farmland.id == farmlandId then
-					local fieldId = field.fieldId
-
-					-- set this as a "fall back" if we don't get a "real" field number below
-					-- this is likely to happen on any enlarged fields, and at the borders of a lot
-					-- of the base game maps.
-					fieldNumber = fieldId
-
-					for a=1, #field.setFieldStatusPartitions do
-						local b                    = field.setFieldStatusPartitions[a]
-						local x, z, wX, wZ, hX, hZ = b.x0, b.z0, b.widthX, b.widthZ, b.heightX, b.heightZ
-						local distanceMax          = math.max(wX,wZ,hX,hZ)
-						local distance             = MathUtil.vector2Length(wx-x,wz-z);
-						if distance <= distanceMax then
-							fieldNumber = fieldId
-							foundField  = true
-							break
-						end
-					end
-				end
-			end
+		if ( farmlandId ~= nil ) then
+			return { fieldOn = isField, fieldNum = farmlandId }
 		end
 	end
+
 	return { fieldOn = isField, fieldNum = fieldNumber }
 end
 
