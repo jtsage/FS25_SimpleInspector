@@ -106,7 +106,7 @@ function FS25FSGUnits:new(logger)
 		}
 	}
 
-	--self.logger:printVariable(self.unit_select, FS22Log.LOG_LEVEL.VERBOSE, "units:unit_select")
+	--self.logger:printVariable(self.unit_select, FS25Log.LOG_LEVEL.VERBOSE, "units:unit_select")
 
 	return self
 end

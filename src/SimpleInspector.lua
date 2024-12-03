@@ -1,8 +1,8 @@
 --
--- Mod: FS22_SimpleInspector
+-- Mod: FS25_SimpleInspector
 --
 -- Author: JTSage
--- source: https://github.com/jtsage/FS22_Simple_Inspector
+-- source: https://github.com/jtsage/FS25_Simple_Inspector
 -- credits: HappyLooser/VehicleInspector for the isOnField logic, and some pointers on where to find info
 
 SimpleInspector= {}
@@ -25,13 +25,13 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.speedMeterDisplay = mission.hud.speedMeter
 	self.ingameMap         = mission.hud.ingameMap
 
-	source(modDirectory .. 'lib/fs22ModPrefSaver.lua')
+	source(modDirectory .. 'lib/fs25ModPrefSaver.lua')
 	source(modDirectory .. 'lib/fs25FSGUnitConvert.lua')
 
 	self.convert  = FS25FSGUnits:new(self.logger)
 
-	self.settings = FS22PrefSaver:new(
-		"FS22_SimpleInspector",
+	self.settings = FS25PrefSaver:new(
+		"FS25_SimpleInspector",
 		"simpleInspector.xml",
 		true,
 		{
@@ -212,7 +212,7 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
   self.bgRight:setColor(r, g, b, a)
   self.icons = {}
 
-	self.logger:print(":new() Initialized", FS22Log.LOG_LEVEL.VERBOSE, "method_track")
+	self.logger:print(":new() Initialized", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
 
 	return self
 end
@@ -660,7 +660,7 @@ function SimpleInspector:updateVehicles()
 		end
 	end
 
-	self.logger:printVariable(new_data_table, FS22Log.LOG_LEVEL.VERBOSE, "display_data", 3)
+	self.logger:printVariable(new_data_table, FS25Log.LOG_LEVEL.VERBOSE, "display_data", 3)
 
 	self.display_data = {unpack(new_data_table)}
 end
@@ -940,7 +940,7 @@ function SimpleInspector:draw()
 			end
 		end
 
-		self.logger:printVariable(outputTextLines, FS22Log.LOG_LEVEL.VERBOSE, "outputTextLines", 3)
+		self.logger:printVariable(outputTextLines, FS25Log.LOG_LEVEL.VERBOSE, "outputTextLines", 3)
 
 		for dispLineNum=1, #outputTextLines do
 			local thisLinePlainText = ""
@@ -1035,7 +1035,7 @@ end
 function SimpleInspector:onStartMission(mission)
 	-- Load the mod, make the box that info lives in.
 
-	self.logger:print(JTSUtil.qConcat("Loaded - version : ", self.version), FS22Log.LOG_LEVEL.INFO, "user_info")
+	self.logger:print(JTSUtil.qConcat("Loaded - version : ", self.version), FS25Log.LOG_LEVEL.INFO, "user_info")
 
 	if not self.isClient then
 		return
@@ -1045,7 +1045,7 @@ function SimpleInspector:onStartMission(mission)
 	self.settings:loadSettings()
 	self.settings:saveSettings()
 
-	self.logger:print(":onStartMission()", FS22Log.LOG_LEVEL.VERBOSE, "method_track")
+	self.logger:print(":onStartMission()", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
 
 	-- self:createTextBox()
 	self.marginWidth, self.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({ 8, 8 })
@@ -1096,7 +1096,7 @@ end
 
 function SimpleInspector:createTextBox()
 	-- make the box we live in.
-	self.logger:print(":createTextBox()", FS22Log.LOG_LEVEL.VERBOSE, "method_track")
+	self.logger:print(":createTextBox()", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
 
 	local baseX, baseY = self:findOrigin()
 
@@ -1152,7 +1152,7 @@ end
 -- function SimpleInspector:actionReloadConfig()
 -- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
--- 	thisModEnvironment.logger:print("force reload settings", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- 	thisModEnvironment.logger:print("force reload settings", FS25Log.LOG_LEVEL.INFO, "user_info")
 
 -- 	thisModEnvironment.settings:loadSettings()
 -- end
@@ -1160,7 +1160,7 @@ end
 -- function SimpleInspector:actionToggleAllFarms()
 -- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
--- 	thisModEnvironment.logger:print("toggle all farms", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- 	thisModEnvironment.logger:print("toggle all farms", FS25Log.LOG_LEVEL.INFO, "user_info")
 
 -- 	thisModEnvironment.settings:setValue("isEnabledShowUnowned", not thisModEnvironment.settings:getValue("isEnabledShowUnowned"))
 -- 	thisModEnvironment.settings:saveSettings()
@@ -1168,7 +1168,7 @@ end
 
 -- function SimpleInspector:actionToggleVisible()
 -- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
--- 	thisModEnvironment.logger:print("toggle display", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- 	thisModEnvironment.logger:print("toggle display", FS25Log.LOG_LEVEL.INFO, "user_info")
 
 -- 	thisModEnvironment.settings:setValue("isEnabledVisible", not thisModEnvironment.settings:getValue("isEnabledVisible"))
 -- 	thisModEnvironment.settings:saveSettings()

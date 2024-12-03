@@ -1,16 +1,16 @@
-FS22PrefSaver = {}
+FS25PrefSaver = {}
 
-FS22PrefSaver.typeMap = {
+FS25PrefSaver.typeMap = {
 	boolean = "bool",
 	number  = "float",
 	string  = "string"
 }
 
-local FS22PrefSaver_mt = Class(FS22PrefSaver)
+local FS25PrefSaver_mt = Class(FS25PrefSaver)
 
 
-function FS22PrefSaver:new(modName, fileName, perSaveSlot, defaults, loadHookFunction, saveHookFunction, debugger)
-	local self = setmetatable({}, FS22PrefSaver_mt)
+function FS25PrefSaver:new(modName, fileName, perSaveSlot, defaults, loadHookFunction, saveHookFunction, debugger)
+	local self = setmetatable({}, FS25PrefSaver_mt)
 
 	self.modName     = modName
 	self.fileName    = fileName
@@ -36,7 +36,7 @@ function FS22PrefSaver:new(modName, fileName, perSaveSlot, defaults, loadHookFun
 	return self
 end
 
-function FS22PrefSaver:addDefaults(defaults)
+function FS25PrefSaver:addDefaults(defaults)
 	if type(defaults) == "table" then
 		for defName, defSetting in pairs(defaults) do
 			if type(defSetting) == "table" then
@@ -44,51 +44,51 @@ function FS22PrefSaver:addDefaults(defaults)
 			else
 				self.defaults[defName] = {
 					defSetting,
-					FS22PrefSaver.typeMap[type(defSetting)]
+					FS25PrefSaver.typeMap[type(defSetting)]
 				}
 			end
 		end
 	end
 end
 
-function FS22PrefSaver:dumpSettings()
+function FS25PrefSaver:dumpSettings()
 	self.debugger:printVariable(self.settings, nil, "settings_current")
 end
 
-function FS22PrefSaver:dumpDefaults()
+function FS25PrefSaver:dumpDefaults()
 	self.debugger:printVariable(self.defaults, nil, "settings_default")
 end
 
-function FS22PrefSaver:getValue(name)
+function FS25PrefSaver:getValue(name)
 	if self.settings[name] == nil then
 		if self.defaults[name] == nil or self.defaults[name][1] == nil then
-			self.debugger:print("UnKnown Setting: " .. name, FS22Log.LOG_LEVEL.VERBOSE, "getValue")
+			self.debugger:print("UnKnown Setting: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
 			return nil
 		else
-			self.debugger:print("UnSet Setting (return default): " .. name, FS22Log.LOG_LEVEL.VERBOSE, "getValue")
+			self.debugger:print("UnSet Setting (return default): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
 			return self.defaults[name][1]
 		end
 	else
-		self.debugger:print("Found Setting (return): " .. name, FS22Log.LOG_LEVEL.VERBOSE, "getValue")
+		self.debugger:print("Found Setting (return): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
 		return self.settings[name]
 	end
 end
 
-function FS22PrefSaver:setValue(name, newValue)
+function FS25PrefSaver:setValue(name, newValue)
 	if self.settings[name] == nil and self.defaults[name] == nil then
-		self.debugger:print("Unknown Setting (return nil): " .. name, FS22Log.LOG_LEVEL.VERBOSE, "setValue")
+		self.debugger:print("Unknown Setting (return nil): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "setValue")
 		return nil
 	end
 
 	self.settings[name] = newValue
 
-	self.debugger:print("Set Setting: " .. name, FS22Log.LOG_LEVEL.VERBOSE, "setValue")
+	self.debugger:print("Set Setting: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "setValue")
 
 	return self:getValue(name)
 end
 
 
-function FS22PrefSaver:createSavePath()
+function FS25PrefSaver:createSavePath()
 	local saveFolder = ('%smodSettings/%s'):format(
 		getUserProfileAppPath(),
 		self.modName
@@ -105,7 +105,7 @@ function FS22PrefSaver:createSavePath()
 	end
 end
 
-function FS22PrefSaver:getXMLFileName()
+function FS25PrefSaver:getXMLFileName()
 	local name = self.perSaveSlot and
 		('%smodSettings/%s/savegame%d/%s'):format(
 			getUserProfileAppPath(),
@@ -118,15 +118,15 @@ function FS22PrefSaver:getXMLFileName()
 			self.fileName
 		)
 
-	self.debugger:print("XML File Name: " .. name, FS22Log.LOG_LEVEL.VERBOSE, "getXMLFileName")
+	self.debugger:print("XML File Name: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getXMLFileName")
 	return name
 end
 
-function FS22PrefSaver:xmlPathMaker(key, element, attrib)
+function FS25PrefSaver:xmlPathMaker(key, element, attrib)
 	return key .. "." .. element .. "#" .. attrib
 end
 
-function FS22PrefSaver:saveSettings()
+function FS25PrefSaver:saveSettings()
 	self:createSavePath()
 
 	local key     = "prefSaver"
@@ -168,14 +168,14 @@ function FS22PrefSaver:saveSettings()
 
 	saveXMLFile(xmlFile)
 
-	self.debugger:print("Saved Settings", FS22Log.LOG_LEVEL.DEVEL, "settingsFile")
+	self.debugger:print("Saved Settings", FS25Log.LOG_LEVEL.DEVEL, "settingsFile")
 
 	if type(self.saveHookFunction) =="function" then
 		self.saveHookFunction()
 	end
 end
 
-function FS22PrefSaver:loadSettings()
+function FS25PrefSaver:loadSettings()
 	local key     = "prefSaver"
 
 	if fileExists(self:getXMLFileName()) then
@@ -227,7 +227,7 @@ function FS22PrefSaver:loadSettings()
 		delete(xmlFile)
 	end
 
-	self.debugger:print("Loaded Settings", FS22Log.LOG_LEVEL.DEVEL, "settingsFile")
+	self.debugger:print("Loaded Settings", FS25Log.LOG_LEVEL.DEVEL, "settingsFile")
 
 	if type(self.loadHookFunction) =="function" then
 		self.loadHookFunction()

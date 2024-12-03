@@ -34,10 +34,10 @@ Most view options can be set in the in-game settings menu (scroll down)
 
 ### displayMode (configurable in the game settings menu)
 
-* __1__ - Top left, under the input help display (auto height under key bindings, if active). Not compatible with FS22_InfoMessageHUD (they overlap).  Hidden if large map and key bindings are visible together.
-* __2__ - Top right, under the clock.  Not compatible with FS22_EnhancedVehicle new damage / fuel displays
+* __1__ - Top left, under the vehicle schema. Hidden if help menu visible
+* __2__ - Top right, under the clock.  
 * __3__ - Bottom left, over the map (if shown). Hidden if large map and key bindings are visible together.
-* __4__ - Bottom right, over the speedometer.  Special logic added for FS22_EnhancedVehicle HUD (but not the old style damage / fuel) - not currently supported
+* __4__ - Bottom right, over the speedometer - not currently supported
 * __5__ - Custom placement.  Set X/Y origin point in settings XML file as well.
 
 ### in-game configurable

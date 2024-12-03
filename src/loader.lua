@@ -6,15 +6,15 @@ local modName      = g_currentModName or "unknown"
 local modEnvironment
 
 source(g_currentModDirectory .. 'SimpleInspector.lua')
-source(g_currentModDirectory .. 'lib/fs22Logger.lua')
-source(g_currentModDirectory .. 'lib/fs22SimpleUtils.lua')
+source(g_currentModDirectory .. 'lib/fs25Logger.lua')
+source(g_currentModDirectory .. 'lib/fs25SimpleUtils.lua')
 
 local function load(mission)
 	assert(g_simpleInspector == nil)
 
-	local siLogger = FS22Log:new(
+	local siLogger = FS25Log:new(
 		"simpleInspector",
-		debug and FS22Log.DEBUG_MODE.VERBOSE or FS22Log.DEBUG_MODE.WARNINGS,
+		debug and FS25Log.DEBUG_MODE.VERBOSE or FS25Log.DEBUG_MODE.WARNINGS,
 		{
 			"getValue",
 			"setValue",

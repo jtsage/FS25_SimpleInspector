@@ -1,8 +1,8 @@
--- FS22Log LUA Debug Class for FS22
+-- FS25Log LUA Debug Class for FS25
 --
 -- Class init:
 --
--- yourLogger = FS22Log:new(callerName, debugMode, filterOut, filterExclusive)
+-- yourLogger = FS25Log:new(callerName, debugMode, filterOut, filterExclusive)
 --  * callerName      : Name of your mod, or logging section
 --  * debugMode       : one of the DEBUG_MODEs below, .WARNINGS suggested for production mode
 --  * filterOut       : names to filter **OUT** of printed output
@@ -53,7 +53,7 @@
 -- Note that if you pass an invalid function, *when in debug mode*, a valid function with an error 
 -- message will be returned
 --
--- originFunction = FS22LogFunction (logLevel, originMod, originFunctionName, originFunction)
+-- originFunction = FS25LogFunction (logLevel, originMod, originFunctionName, originFunction)
 --  * logLevel           : Log level from LOG_LEVEL below, has no function is set to .WARNINGS or .ERRORS or .NONE
 --  * originMod          : Name of your mod for printing purposes
 --  * originFunctionName : Name of the original function (string)
@@ -62,60 +62,60 @@
 --
 -- Run Levels:
 --  It is highly recommended that your store this value locally in your mod, and pass it to the
---  constructor / calls to FS22LogFunction() so you can quickly toggle the level for released mods
+--  constructor / calls to FS25LogFunction() so you can quickly toggle the level for released mods
 --  without having to remove all your logging calls.
 --
---  * FS22Log.DEBUG_MODE.NONE     - Print nothing, ever
---  * FS22Log.DEBUG_MODE.ERRORS   - Print errors
---  * FS22Log.DEBUG_MODE.WARNINGS - Print warnings, suggested for "production" mode
---  * FS22Log.DEBUG_MODE.INFO     - Print information
---  * FS22Log.DEBUG_MODE.DEVEL    - Print Development information
---  * FS22Log.DEBUG_MODE.VERBOSE  - Print Verbose Development information
+--  * FS25Log.DEBUG_MODE.NONE     - Print nothing, ever
+--  * FS25Log.DEBUG_MODE.ERRORS   - Print errors
+--  * FS25Log.DEBUG_MODE.WARNINGS - Print warnings, suggested for "production" mode
+--  * FS25Log.DEBUG_MODE.INFO     - Print information
+--  * FS25Log.DEBUG_MODE.DEVEL    - Print Development information
+--  * FS25Log.DEBUG_MODE.VERBOSE  - Print Verbose Development information
 --
 -- Log Levels:
---  * FS22Log.LOG_LEVEL.ERROR   - Errors only
---  * FS22Log.LOG_LEVEL.WARNING - Warnings, suggested for "production" mode
---  * FS22Log.LOG_LEVEL.INFO    - Information level
---  * FS22Log.LOG_LEVEL.DEVEL   - Development information
---  * FS22Log.LOG_LEVEL.VERBOSE - Verbose Development information
+--  * FS25Log.LOG_LEVEL.ERROR   - Errors only
+--  * FS25Log.LOG_LEVEL.WARNING - Warnings, suggested for "production" mode
+--  * FS25Log.LOG_LEVEL.INFO    - Information level
+--  * FS25Log.LOG_LEVEL.DEVEL   - Development information
+--  * FS25Log.LOG_LEVEL.VERBOSE - Verbose Development information
 --
 -- Search Types:
---  * FS22Log.SEARCH.KEYS            - Search keys only
---  * FS22Log.SEARCH.VALUES          - Search values only
---  * FS22Log.SEARCH.BOTH            - Search both keys and values
---  * FS22Log.SEARCH.KEYS_AND_VALUES - Search both keys and values
+--  * FS25Log.SEARCH.KEYS            - Search keys only
+--  * FS25Log.SEARCH.VALUES          - Search values only
+--  * FS25Log.SEARCH.BOTH            - Search both keys and values
+--  * FS25Log.SEARCH.KEYS_AND_VALUES - Search both keys and values
 --
 -- (c)JTSage Modding & FSG Modding.  You may reuse or alter this code to your needs as necessary with
 -- no prior permission.  No warranty implied or otherwise.
 
-FS22Log = {}
+FS25Log = {}
 
-local FS22Log_mt = Class(FS22Log)
+local FS25Log_mt = Class(FS25Log)
 
-FS22Log.DEBUG_MODE          = {}
-FS22Log.DEBUG_MODE.NONE     = 0
-FS22Log.DEBUG_MODE.ERRORS   = 1
-FS22Log.DEBUG_MODE.WARNINGS = 2
-FS22Log.DEBUG_MODE.INFO     = 3
-FS22Log.DEBUG_MODE.DEVEL    = 4
-FS22Log.DEBUG_MODE.VERBOSE  = 5
+FS25Log.DEBUG_MODE          = {}
+FS25Log.DEBUG_MODE.NONE     = 0
+FS25Log.DEBUG_MODE.ERRORS   = 1
+FS25Log.DEBUG_MODE.WARNINGS = 2
+FS25Log.DEBUG_MODE.INFO     = 3
+FS25Log.DEBUG_MODE.DEVEL    = 4
+FS25Log.DEBUG_MODE.VERBOSE  = 5
 
-FS22Log.LOG_LEVEL         = {}
-FS22Log.LOG_LEVEL.ERROR   = 1
-FS22Log.LOG_LEVEL.WARNING = 2
-FS22Log.LOG_LEVEL.INFO    = 3
-FS22Log.LOG_LEVEL.DEVEL   = 4
-FS22Log.LOG_LEVEL.VERBOSE = 5
+FS25Log.LOG_LEVEL         = {}
+FS25Log.LOG_LEVEL.ERROR   = 1
+FS25Log.LOG_LEVEL.WARNING = 2
+FS25Log.LOG_LEVEL.INFO    = 3
+FS25Log.LOG_LEVEL.DEVEL   = 4
+FS25Log.LOG_LEVEL.VERBOSE = 5
 
-FS22Log.SEARCH                 = {}
-FS22Log.SEARCH.NONE            = 0
-FS22Log.SEARCH.KEYS            = 1
-FS22Log.SEARCH.VALUES          = 2
-FS22Log.SEARCH.BOTH            = 3
-FS22Log.SEARCH.KEYS_AND_VALUES = 3
-FS22Log.SEARCH.BAD_TERMS       = 4
+FS25Log.SEARCH                 = {}
+FS25Log.SEARCH.NONE            = 0
+FS25Log.SEARCH.KEYS            = 1
+FS25Log.SEARCH.VALUES          = 2
+FS25Log.SEARCH.BOTH            = 3
+FS25Log.SEARCH.KEYS_AND_VALUES = 3
+FS25Log.SEARCH.BAD_TERMS       = 4
 
-FS22Log.SEARCH_TEXT = {
+FS25Log.SEARCH_TEXT = {
 	[0] = "NONE",
 	[1] = "KEYS",
 	[2] = "VALUES",
@@ -123,7 +123,7 @@ FS22Log.SEARCH_TEXT = {
 	[4] = "-ERROR-"
 }
 
-FS22Log.LOG_LEVEL_TEXT = {
+FS25Log.LOG_LEVEL_TEXT = {
 	[1] = "ERROR",
 	[2] = "WARNING",
 	[3] = "INFO",
@@ -131,11 +131,11 @@ FS22Log.LOG_LEVEL_TEXT = {
 	[5] = "VERBOSE"
 }
 
-function FS22Log:new(callerName, debugMode, filterOut, filterExclusive)
-	local self = setmetatable({}, FS22Log_mt)
+function FS25Log:new(callerName, debugMode, filterOut, filterExclusive)
+	local self = setmetatable({}, FS25Log_mt)
 
 	self.calledName = callerName or "UnKnown Script"
-	self.debugMode  = debugMode or FS22Log.DEBUG_MODE.ERRORS
+	self.debugMode  = debugMode or FS25Log.DEBUG_MODE.ERRORS
 	self.filteredOut  = {}
 	self.filteredIn   = {}
 	self.trackOnce    = {}
@@ -153,7 +153,7 @@ function FS22Log:new(callerName, debugMode, filterOut, filterExclusive)
 	return self
 end
 
-function FS22Log:makeStringRep(inputTable)
+function FS25Log:makeStringRep(inputTable)
 	if type(inputTable) ~= "table" then
 		return tostring(inputTable)
 	end
@@ -165,7 +165,7 @@ function FS22Log:makeStringRep(inputTable)
 	return stringRep
 end
 
-function FS22Log:isNotSameStored(filterName, inputTable)
+function FS25Log:isNotSameStored(filterName, inputTable)
 	local stringValue = self:makeStringRep(inputTable)
 
 	for seenName, seenValue in pairs(self.trackChanges) do
@@ -185,7 +185,7 @@ function FS22Log:isNotSameStored(filterName, inputTable)
 	return true
 end
 
-function FS22Log:wasSeen(filterName)
+function FS25Log:wasSeen(filterName)
 	for _, seenName in ipairs(self.trackOnce) do
 		if seenName == filterName then
 			return true
@@ -194,7 +194,7 @@ function FS22Log:wasSeen(filterName)
 	table.insert(self.trackOnce, filterName)
 end
 
-function FS22Log:isFiltered(filterOperator)
+function FS25Log:isFiltered(filterOperator)
 	if self.filteredIn ~= nil and #self.filteredIn > 0 then
 		if filterOperator == nil then
 			return true
@@ -220,31 +220,31 @@ function FS22Log:isFiltered(filterOperator)
 	return false
 end
 
-function FS22Log:cleanLogLevel(logLevel)
+function FS25Log:cleanLogLevel(logLevel)
 	local cleanLogLevel
 
 	if logLevel ~= nil and type(logLevel) == "number" and logLevel > 0 then
 		cleanLogLevel = logLevel
 	else
-		cleanLogLevel = FS22Log.LOG_LEVEL.DEVEL
+		cleanLogLevel = FS25Log.LOG_LEVEL.DEVEL
 	end
 
 	return cleanLogLevel
 end
 
-function FS22Log:processSearchTerms(testTable, searchTerms, logLevel, filter)
+function FS25Log:processSearchTerms(testTable, searchTerms, logLevel, filter)
 	local findWords = {}
-	local findType  = FS22Log.SEARCH.NONE
+	local findType  = FS25Log.SEARCH.NONE
 	if searchTerms == nil or testTable == nil or type(testTable) ~= "table" then
 		return false, nil, nil
 	end
 
 	if type(searchTerms) ~= "table" then
-		findType  = FS22Log.SEARCH.KEYS
+		findType  = FS25Log.SEARCH.KEYS
 		findWords = { searchTerms }
 	else
 		if #searchTerms ~= 2 or type(searchTerms[2]) ~= "number" then
-			return true, FS22Log.SEARCH.BAD_TERMS, nil
+			return true, FS25Log.SEARCH.BAD_TERMS, nil
 		end
 
 		findType = searchTerms[2]
@@ -261,21 +261,21 @@ function FS22Log:processSearchTerms(testTable, searchTerms, logLevel, filter)
 	return true, findType, findWords
 end
 
-function FS22Log:searchTerm(testKey, testValue, findType, findWords)
-	if findType == FS22Log.SEARCH.BAD_TERMS then
+function FS25Log:searchTerm(testKey, testValue, findType, findWords)
+	if findType == FS25Log.SEARCH.BAD_TERMS then
 		return false
 	end
-	if findType == FS22Log.SEARCH.NONE then
+	if findType == FS25Log.SEARCH.NONE then
 		return true
 	end
-	if findType == FS22Log.SEARCH.KEYS or findType == FS22Log.SEARCH.BOTH then
+	if findType == FS25Log.SEARCH.KEYS or findType == FS25Log.SEARCH.BOTH then
 		for _, lookWord in ipairs(findWords) do
 			if string.find(tostring(testKey), tostring(lookWord)) then
 				return true
 			end
 		end
 	end
-	if findType == FS22Log.SEARCH.VALUES or findType == FS22Log.SEARCH.BOTH then
+	if findType == FS25Log.SEARCH.VALUES or findType == FS25Log.SEARCH.BOTH then
 		for _, lookWord in ipairs(findWords) do
 			if string.find(tostring(testValue), tostring(lookWord)) then
 				return true
@@ -285,18 +285,18 @@ function FS22Log:searchTerm(testKey, testValue, findType, findWords)
 	return false
 end
 
-function FS22Log:print(text, logLevel, filter)
+function FS25Log:print(text, logLevel, filter)
 	local logLevel = self:cleanLogLevel(logLevel)
 
 	if self.debugMode >= logLevel then
 		if not self:isFiltered(filter) then
-			local levelText  = FS22Log.LOG_LEVEL_TEXT[logLevel] or "UNKNOWN"
+			local levelText  = FS25Log.LOG_LEVEL_TEXT[logLevel] or "UNKNOWN"
 			local filterText = filter or "--"
 			local outputText = "~~ " .. self.calledName .. ":" .. levelText .. ":" .. filterText .. " | " .. text
 
-			if logLevel == FS22Log.LOG_LEVEL.ERROR then
+			if logLevel == FS25Log.LOG_LEVEL.ERROR then
 				printError(outputText)
-			elseif logLevel == FS22Log.LOG_LEVEL.WARNING then
+			elseif logLevel == FS25Log.LOG_LEVEL.WARNING then
 				printWarning(outputText)
 			else
 				print(outputText)
@@ -306,16 +306,16 @@ function FS22Log:print(text, logLevel, filter)
 end
 
 
-function FS22Log:printVariableIsTable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
+function FS25Log:printVariableIsTable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 	if output == nil then
-		logLevel = FS22Log.LOG_LEVEL.ERROR
+		logLevel = FS25Log.LOG_LEVEL.ERROR
 	elseif type(output) ~= "table" then
-		logLevel = FS22Log.LOG_LEVEL.WARNING
+		logLevel = FS25Log.LOG_LEVEL.WARNING
 	end
 	self:printVariable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 end
 
-function FS22Log:printVariableOnce(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
+function FS25Log:printVariableOnce(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 	local prefix       = prefix or filter or "{}"
 	local logLevel     = self:cleanLogLevel(logLevel)
 	local depthLimit   = depthLimit or 2
@@ -328,7 +328,7 @@ function FS22Log:printVariableOnce(output, logLevel, filter, depthLimit, prefix,
 	self:printVariable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 end
 
-function FS22Log:printVariableIfChanged(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
+function FS25Log:printVariableIfChanged(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 	local prefix       = prefix or filter or "{}"
 	local logLevel     = self:cleanLogLevel(logLevel)
 	local depthLimit   = depthLimit or 2
@@ -341,7 +341,7 @@ function FS22Log:printVariableIfChanged(output, logLevel, filter, depthLimit, pr
 	self:printVariable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 end
 
-function FS22Log:printVariable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
+function FS25Log:printVariable(output, logLevel, filter, depthLimit, prefix, searchTerms, currentDepth)
 	local prefix       = prefix or filter or "{}"
 	local logLevel     = self:cleanLogLevel(logLevel)
 	local depthLimit   = depthLimit or 2
@@ -367,7 +367,7 @@ function FS22Log:printVariable(output, logLevel, filter, depthLimit, prefix, sea
 
 	if searchDo == true and currentDepth == 0 and searchType > 0 and searchType < 4 and type(searchWords) == "table" then
 		self:print(
-			"Searching for: {" .. table.concat(searchWords, ",") .. "} [" .. FS22Log.SEARCH_TEXT[searchType] .. "]",
+			"Searching for: {" .. table.concat(searchWords, ",") .. "} [" .. FS25Log.SEARCH_TEXT[searchType] .. "]",
 			logLevel,
 			filter
 		)
@@ -375,7 +375,7 @@ function FS22Log:printVariable(output, logLevel, filter, depthLimit, prefix, sea
 
 	currentDepth = currentDepth + 1
 
-	if searchType == FS22Log.SEARCH.BAD_TERMS then
+	if searchType == FS25Log.SEARCH.BAD_TERMS then
 		self:print("ERROR: Incorrect search terms, see logger documentation", logLevel, filter)
 		return
 	end
@@ -387,7 +387,7 @@ function FS22Log:printVariable(output, logLevel, filter, depthLimit, prefix, sea
 		local thisPrefix  = prefix .. "." .. keyString
 		local searchFound = true
 
-		if searchDo and searchType ~= FS22Log.SEARCH.BAD_TERMS then
+		if searchDo and searchType ~= FS25Log.SEARCH.BAD_TERMS then
 			searchFound = self:searchTerm(key, value, searchType, searchWords)
 		end
 
@@ -413,8 +413,8 @@ function FS22Log:printVariable(output, logLevel, filter, depthLimit, prefix, sea
 	end
 end
 
-function FS22LogFunction (logLevel, originMod, originFunctionName, originFunction)
-	if logLevel == nil or logLevel <= FS22Log.DEBUG_MODE.WARNINGS then return originFunction end
+function FS25LogFunction (logLevel, originMod, originFunctionName, originFunction)
+	if logLevel == nil or logLevel <= FS25Log.DEBUG_MODE.WARNINGS then return originFunction end
 	if originFunction ~= nil then
 		return function (...)
 			local argNames  = function(...) return arg end
