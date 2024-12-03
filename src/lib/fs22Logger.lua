@@ -421,8 +421,8 @@ function FS22LogFunction (logLevel, originMod, originFunctionName, originFunctio
 			local argValues = argNames(...)
 			if type(argValues) == "table" then
 				local argListText = ""
-				for idx, arggy in ipairs(argValues) do
-					argListText = argListText .. (idx == 1 and "" or ", ") .. '[' .. tostring(arggy) .. ']'
+				for idx, thisArg in ipairs(argValues) do
+					argListText = argListText .. (idx == 1 and "" or ", ") .. '[' .. tostring(thisArg) .. ']'
 				end
 				print("~~ " .. originMod .. ":" .. originFunctionName .. " | Called With: " .. argListText)
 			else

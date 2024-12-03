@@ -107,7 +107,9 @@
 		"printError",
 		"printWarning",
 		"FSCareerMissionInfo",
-		"InGameMenuSettingsFrame"
+		"InGameMenuSettingsFrame",
+		"g_hudAnchorRight",
+		"g_hudAnchorTop"
 	],
 	"cSpell.words": [
 		"allfarms",
@@ -117,7 +119,10 @@
 		"filltype",
 		"getfenv",
 		"ingame",
+		"nodir",
 		"precendence",
+		"retty",
+		"savegame",
 		"Seperator"
 	]
 }

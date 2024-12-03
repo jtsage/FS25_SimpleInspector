@@ -26,9 +26,9 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.ingameMap         = mission.hud.ingameMap
 
 	source(modDirectory .. 'lib/fs22ModPrefSaver.lua')
-	source(modDirectory .. 'lib/fs22FSGUnitConvert.lua')
+	source(modDirectory .. 'lib/fs25FSGUnitConvert.lua')
 
-	self.convert  = FS22FSGUnits:new(self.logger)
+	self.convert  = FS25FSGUnits:new(self.logger)
 
 	self.settings = FS22PrefSaver:new(
 		"FS22_SimpleInspector",
@@ -161,6 +161,14 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.STATUS.CONTROLLED = 2
 	self.STATUS.AI         = 1
 	self.STATUS.OFF        = 0
+
+	self.D_MODE           = {}
+	self.D_MODE.HELP_TEXT = 1
+	self.D_MODE.MAP       = 3
+	self.D_MODE.CLOCK     = 2
+	self.D_MODE.SPEED     = 4
+	self.D_MODE.CUSTOM    = 5
+
 
 	self.STATUS_COLOR = {
 		[self.STATUS.RUNNING]    = "colorRunning",
@@ -679,10 +687,18 @@ function SimpleInspector:draw()
 			-- Left side display hide on big map with help open
 			-- self.inspectBox:setVisible(false)
 			return
-		elseif self.settings:getValue("displayMode") == 3 and g_currentMission.hud.chatDisplay:getVisible() then
+		elseif self.settings:getValue("displayMode") == self.D_MODE.HELP_TEXT and g_inGameMenu.hud.inputHelp:getVisible() then
+			-- mode 1 (top left), help is open (not supported yet!),
+			return
+		elseif self.settings:getValue("displayMode") == self.D_MODE.MAP and g_currentMission.hud.chatDisplay:getVisible() then
 			-- Over map display and chat is visible, so hide.
 			-- self.inspectBox:setVisible(false)
 			return
+		elseif self.settings:getValue("displayMode") == self.D_MODE.CLOCK and g_currentMission.hud.sideNotifications ~= nil then
+			-- under clock, notificationQueue is not empty.
+			if #g_currentMission.hud.sideNotifications.notificationQueue > 0 then
+				return
+			end
 		else
 			-- we have entries, lets get the overall height of the box and unhide
 			-- self.inspectBox:setVisible(true)
@@ -699,16 +715,16 @@ function SimpleInspector:draw()
 		-- dispTextX/Y is where the text starts (sort of)
 		local dispTextX, dispTextY = self:findOrigin()
 
-		if ( self.settings:getValue("displayMode") == 2 ) then
+		if ( self.settings:getValue("displayMode") == self.D_MODE.CLOCK ) then
 			-- top right (subtract both margins)
 			dispTextX = dispTextX - self.marginWidth
 			dispTextY = dispTextY - self.marginHeight
 			overlayY  = overlayY - overlayH
-		elseif ( self.settings:getValue("displayMode") == 3 ) then
+		elseif ( self.settings:getValue("displayMode") == self.D_MODE.MAP ) then
 			-- bottom left (add x width, add Y height)
 			dispTextX = dispTextX + self.marginWidth
 			dispTextY = dispTextY - self.marginHeight + overlayH
-		elseif ( self.settings:getValue("displayMode") == 4 ) then
+		elseif ( self.settings:getValue("displayMode") == self.D_MODE.SPEED ) then
 			-- bottom right (subtract x width, add Y height)
 			dispTextX = dispTextX - self.marginWidth
 			dispTextY = dispTextY - self.marginHeight + overlayH
@@ -725,13 +741,7 @@ function SimpleInspector:draw()
 			setTextAlignment(RenderText.ALIGN_LEFT)
 		end
 
-		if g_currentMission.hud.sideNotifications ~= nil and self.settings:getValue("displayMode") == 2 then
-			if #g_currentMission.hud.sideNotifications.notificationQueue > 0 then
-				local deltaY = g_currentMission.hud.sideNotifications:getHeight()
-				dispTextY = dispTextY - deltaY
-				overlayY  = overlayY - deltaY
-			end
-		end
+		
 
 		self.inspectText.posX = dispTextX
 		self.inspectText.posY = dispTextY
@@ -1047,19 +1057,19 @@ function SimpleInspector:findOrigin()
 	local tmpX = 0
 	local tmpY = 0
 
-	if ( self.settings:getValue("displayMode") == 2 ) then
+	if ( self.settings:getValue("displayMode") == self.D_MODE.CLOCK ) then
 		-- top right display
-		tmpX, tmpY = self.gameInfoDisplay:getPosition()
-		tmpX = 1
-		tmpY = tmpY - 0.012
-	elseif ( self.settings:getValue("displayMode") == 3 ) then
+		-- tmpX, tmpY = self.gameInfoDisplay:getPosition()
+		tmpX = g_hudAnchorRight - 0.004
+		tmpY = g_hudAnchorTop - 0.074
+	elseif ( self.settings:getValue("displayMode") == self.D_MODE.MAP ) then
 		-- Bottom left, correct origin.
 		tmpX = 0.01622
 		tmpY = 0 + self.ingameMap:getHeight() + 0.01622
 		if g_gameSettings:getValue("ingameMapState") > 1 then
 			tmpY = tmpY + 0.032
 		end
-	elseif ( self.settings:getValue("displayMode") == 4 ) then
+	elseif ( self.settings:getValue("displayMode") == self.D_MODE.SPEED ) then
 		-- bottom right display
 		tmpX = 1
 		tmpY = 0.01622
@@ -1069,26 +1079,16 @@ function SimpleInspector:findOrigin()
 				tmpY = tmpY + 0.03
 			end
 		end
-	elseif ( self.settings:getValue("displayMode") == 5 ) then
+	elseif ( self.settings:getValue("displayMode") == self.D_MODE.CUSTOM ) then
 		tmpX = self.settings:getValue("displayMode5X")
 		tmpY = self.settings:getValue("displayMode5Y")
 	else
 		-- top left display
 		tmpX = 0.014
 		tmpY = 0.945
-		if g_inGameMenu.hud.inputHelp.isVisible then
-			tmpY = tmpY - self.inputHelpDisplay:getHeight() - 0.012
-		else
-			if g_currentMission.hud.controlledVehicle ~= nil and _G['FS22_precisionFarming'] ~= nil then
-				for idx, extension in ipairs(self.mission.hud.inputHelp.vehicleHudExtensions) do
-					if extension.extendedSowingMachine ~= nil then
-						tmpY = tmpY - (Utils.getNoNil(extension.displayHeight , 0) + 0.012)
-					elseif extension.extendedSprayer ~= nil then
-						tmpY = tmpY - (Utils.getNoNil(extension.displayHeight , 0) - 0.012)
-					end
-				end
-			end
-		end
+		-- if g_inGameMenu.hud.inputHelp.isVisible then
+		-- hidden when help text is visible
+		-- end
 	end
 
 	return tmpX, tmpY
@@ -1140,42 +1140,39 @@ function SimpleInspector:delete()
 	end
 end
 
-function SimpleInspector:registerActionEvents()
-	local _, reloadConfig = g_inputBinding:registerActionEvent('SimpleInspector_reload_config', self,
-		SimpleInspector.actionReloadConfig, false, true, false, true)
-	g_inputBinding:setActionEventTextVisibility(reloadConfig, false)
-	local _, toggleVisible = g_inputBinding:registerActionEvent('SimpleInspector_toggle_visible', self,
-		SimpleInspector.actionToggleVisible, false, true, false, true)
-	g_inputBinding:setActionEventTextVisibility(toggleVisible, false)
-	local _, toggleAllFarms = g_inputBinding:registerActionEvent('SimpleInspector_toggle_allfarms', self,
-		SimpleInspector.actionToggleAllFarms, false, true, false, true)
-	g_inputBinding:setActionEventTextVisibility(toggleAllFarms, false)
-end
+-- function SimpleInspector:registerActionEvents()
+-- 	local _, reloadConfig = g_inputBinding:registerActionEvent('SimpleInspector_reload_config', self,
+-- 		SimpleInspector.actionReloadConfig, false, true, false, true)
+-- 	g_inputBinding:setActionEventTextVisibility(reloadConfig, false)
+-- 	local _, toggleVisible = g_inputBinding:registerActionEvent('SimpleInspector_toggle_visible', self,
+-- 		SimpleInspector.actionToggleVisible, false, true, false, true)
+-- 	g_inputBinding:setActionEventTextVisibility(toggleVisible, false)
+-- end
 
-function SimpleInspector:actionReloadConfig()
-	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
+-- function SimpleInspector:actionReloadConfig()
+-- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
-	thisModEnvironment.logger:print("force reload settings", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- 	thisModEnvironment.logger:print("force reload settings", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnvironment.settings:loadSettings()
-end
+-- 	thisModEnvironment.settings:loadSettings()
+-- end
 
-function SimpleInspector:actionToggleAllFarms()
-	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
+-- function SimpleInspector:actionToggleAllFarms()
+-- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
 
-	thisModEnvironment.logger:print("toggle all farms", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- 	thisModEnvironment.logger:print("toggle all farms", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnvironment.settings:setValue("isEnabledShowUnowned", not thisModEnvironment.settings:getValue("isEnabledShowUnowned"))
-	thisModEnvironment.settings:saveSettings()
-end
+-- 	thisModEnvironment.settings:setValue("isEnabledShowUnowned", not thisModEnvironment.settings:getValue("isEnabledShowUnowned"))
+-- 	thisModEnvironment.settings:saveSettings()
+-- end
 
-function SimpleInspector:actionToggleVisible()
-	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
-	thisModEnvironment.logger:print("toggle display", FS22Log.LOG_LEVEL.INFO, "user_info")
+-- function SimpleInspector:actionToggleVisible()
+-- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
+-- 	thisModEnvironment.logger:print("toggle display", FS22Log.LOG_LEVEL.INFO, "user_info")
 
-	thisModEnvironment.settings:setValue("isEnabledVisible", not thisModEnvironment.settings:getValue("isEnabledVisible"))
-	thisModEnvironment.settings:saveSettings()
-end
+-- 	thisModEnvironment.settings:setValue("isEnabledVisible", not thisModEnvironment.settings:getValue("isEnabledVisible"))
+-- 	thisModEnvironment.settings:saveSettings()
+-- end
 
 
 function SimpleInspector.addMenuOption(original, target, id, i18n_title, i18n_tooltip, options, callback)
@@ -1218,8 +1215,6 @@ function SimpleInspector.initGui(self)
 		menuTitle:setText(g_i18n:getText("title_simpleInspector"))
 		self.generalSettingsLayout:addElement(menuTitle)
 
-		g_simpleInspector.logger:printVariable(self.generalSettingsLayout.elements[8], FS22Log.LOG_LEVEL.VERBOSE, "menu_item_8", 3)
-
 		self.menuOption_DisplayMode = SimpleInspector.addMenuOption(
 			self.generalSettingsLayout.elements[8],
 			g_simpleInspector,
@@ -1229,14 +1224,12 @@ function SimpleInspector.initGui(self)
 			{
 				g_i18n:getText("setting_simpleInspector_DisplayMode1"),
 				g_i18n:getText("setting_simpleInspector_DisplayMode2"),
-				g_i18n:getText("setting_simpleInspector_DisplayMode3"),
-				g_i18n:getText("setting_simpleInspector_DisplayMode4")
+				g_i18n:getText("setting_simpleInspector_DisplayMode3")
+				-- g_i18n:getText("setting_simpleInspector_DisplayMode4")
 			},
 			"onMenuOptionChanged_DisplayMode"
 		)
 		self.generalSettingsLayout:addElement(self.menuOption_DisplayMode)
-
-		g_simpleInspector.logger:printVariable(self.menuOption_DisplayMode, FS22Log.LOG_LEVEL.VERBOSE, "displayMode", 3)
 
 		for _, thisOptionName in ipairs(unitOptions) do
 			-- Boolean style options
@@ -1328,8 +1321,6 @@ function SimpleInspector:onMenuOptionChanged_setValueTextSize(state)
 end
 
 function SimpleInspector:onMenuOptionChanged_DisplayMode(state)
-	print("~~ display mode " .. state .. ":")
-	self.logger:printVariable(self.settings, FS22Log.LOG_LEVEL.VERBOSE, "settingsDump")
 	self.settings:setValue("displayMode", state)
 	self.settings:saveSettings()
 end
@@ -1343,7 +1334,6 @@ function SimpleInspector:onMenuOptionChanged_boolOpt(state, info)
 end
 
 function SimpleInspector:onMenuOptionChanged_unitOpt(state, info)
-	print("~~ " .. state .. ":" .. info.id)
 	self.settings:setValue(
 		"isEnabled" .. string.sub(info.id, (#"simpleInspector_"+1)),
 		state

@@ -1,9 +1,9 @@
-# FS22_SimpleInspector
+# FS25_SimpleInspector
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/jtsage/FS22_simpleInspector) ![GitHub all releases](https://img.shields.io/github/downloads/jtsage/FS22_simpleInspector/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/jtsage/FS25_simpleInspector) ![GitHub all releases](https://img.shields.io/github/downloads/jtsage/FS25_simpleInspector/total)
 
 <p align="left">
-  <img src="https://github.com/jtsage/FS22_simpleInspector/raw/main/modIcon.png">
+  <img src="https://github.com/jtsage/FS25_simpleInspector/raw/main/icon_simpleinspector.png" alt="">
 </p>
 
 Spiritual ripoff of VehicleInspector - pared down to what I need/want
@@ -16,24 +16,19 @@ unknowingly using an old version.  For "official" releases, please use the relea
 
 ## Features
 
-* 4 on screen placement locations - each corner of the display
+* 3 on screen placement locations - each corner of the display
 * Just your vehicles or all vehicles
 * Speed of vehicles
 * Fuel level of vehicles
 * On Field Status, optionally with Field number
-* Occupation status - Vanilla AI, AutoDrive, CoursePlay, user, or noone
+* Occupation status - Vanilla AI, AutoDrive, CoursePlay, user, or no-one
 * CoursePlay course progression, if applicable
 * Fill level of vehicle and attached implements
 * Damage warning if vehicle or attached implement is over threshold
 
-## Default Input Bindings
-
-* `Left Ctrl` + `Left Alt` + `Num Pad 9` : Reload configuration file from disk
-* `Left Alt` + `Num Pad 9` : Toggle Visibility
-
 ## Options
 
-All options are set via a xml file in `modSettings/FS22_SimpleInspector/savegame##/simpleInspector.xml`
+All options are set via a xml file in `modSettings/FS25_SimpleInspector/savegame##/simpleInspector.xml`
 
 Most view options can be set in the in-game settings menu (scroll down)
 
@@ -42,12 +37,11 @@ Most view options can be set in the in-game settings menu (scroll down)
 * __1__ - Top left, under the input help display (auto height under key bindings, if active). Not compatible with FS22_InfoMessageHUD (they overlap).  Hidden if large map and key bindings are visible together.
 * __2__ - Top right, under the clock.  Not compatible with FS22_EnhancedVehicle new damage / fuel displays
 * __3__ - Bottom left, over the map (if shown). Hidden if large map and key bindings are visible together.
-* __4__ - Bottom right, over the speedometer.  Special logic added for FS22_EnhancedVehicle HUD (but not the old style damage / fuel)
+* __4__ - Bottom right, over the speedometer.  Special logic added for FS22_EnhancedVehicle HUD (but not the old style damage / fuel) - not currently supported
 * __5__ - Custom placement.  Set X/Y origin point in settings XML file as well.
 
 ### in-game configurable
 
-    
 * __isEnabledShowPlayer__ - show player name for user controlled vehicles, multi-player only
 * __isEnabledShowAll__ - always show all vehicles
 * __isEnabledShowFillPercent__ - show fill level percentage
@@ -129,5 +123,5 @@ Default: `SPD_SEP_GAS_SEP_DAM*_FLD*_AIT*_USR-_VEH_FIL`
 ## Sample
 
 <p align="center">
-  <img width="650" src="https://github.com/jtsage/FS22_simpleInspector/raw/main/readme_Modes.png">
+  <img width="650" src="https://github.com/jtsage/FS25_simpleInspector/raw/modHub_screenshots/002_sshot_overview_multi_mode.png" alt="">
 </p>

@@ -17,11 +17,7 @@ Display Options:
  - CoursePlay course progression and time remaining, if applicable
  - AutoDrive course time remaining, if applicable
  - Fill level of vehicle and attached implements
- - Damage warning if vehicle or attached implement is over threshold
-
-Default Input Bindings:
-Left Ctrl + Left Alt + Num Pad 9 : Reload configuration file from disk
-Left Alt + Num Pad 9 : Toggle HUD Visibility]]></en>
+ - Damage warning if vehicle or attached implement is over threshold]]></en>
         <de><![CDATA[Einfacher Inspektor zeigt ein HUD-Overlay mit Fahrzeugstatistiken
 
 Anzeigeoptionen:
@@ -35,11 +31,7 @@ Anzeigeoptionen:
  - CoursePlay Kursverlauf und verbleibende Zeit, falls zutreffend
  - AutoDrive Kurs verbleibende Zeit, falls zutreffend
  - Füllstand des Fahrzeugs und der angehängten Arbeitsgeräte
- - Schadenswarnung, wenn das Fahrzeug oder das angehängte Gerät den Schwellenwert überschreitet
-
-Standard-Eingabebindungen:
-Left Ctrl + Left Alt + Num Pad 9 : Konfigurationsdatei von der Festplatte neu laden
-Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten]]></de>
+ - Schadenswarnung, wenn das Fahrzeug oder das angehängte Gerät den Schwellenwert überschreitet]]></de>
     </description>
     <author>JTSage</author>
     <version>1.0.0.0</version>
@@ -50,10 +42,9 @@ Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten]]></de>
     </extraSourceFiles>
     <l10n filenamePrefix="translations/translation"/>
 
-    <actions>
-        <action name="SimpleInspector_reload_config" category="SYSTEM" axisType="HALF" ignoreComboMask="false" />
-        <action name="SimpleInspector_toggle_visible" category="SYSTEM" axisType="HALF" ignoreComboMask="false" />
-        <action name="SimpleInspector_toggle_allfarms" category="SYSTEM" axisType="HALF" ignoreComboMask="false" />
+    <!-- <actions>
+        <action name="SimpleInspector_reload_config" />
+        <action name="SimpleInspector_toggle_visible" />
     </actions>
     <inputBinding>
         <actionBinding action="SimpleInspector_reload_config">
@@ -62,5 +53,5 @@ Left Alt + Num Pad 9 : HUD-Sichtbarkeit umschalten]]></de>
         <actionBinding action="SimpleInspector_toggle_visible">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_9" axisComponent="+" neutralInput="0" index="1" />
         </actionBinding>
-    </inputBinding>
+    </inputBinding> -->
 </modDesc>
