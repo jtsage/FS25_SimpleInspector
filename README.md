@@ -1,6 +1,6 @@
 # FS25_SimpleInspector
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/jtsage/FS25_simpleInspector) ![GitHub all releases](https://img.shields.io/github/downloads/jtsage/FS25_simpleInspector/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/jtsage/FS25_SimpleInspector) ![GitHub all releases](https://img.shields.io/github/downloads/jtsage/FS25_SimpleInspector/total)
 
 <p align="left">
   <img src="https://github.com/jtsage/FS25_simpleInspector/raw/main/icon_simpleinspector.png" alt="">
