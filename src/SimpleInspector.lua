@@ -36,9 +36,6 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		true,
 		{
 			displayOrder    = "SPD_SEP_GAS_SEP_DAM*_FLD*_AIT*_USR-_VEH_FIL",
-			displayMode     = {3, "int" },
-			displayMode5X   = 0.2,
-			displayMode5Y   = 0.2,
 
 			isEnabledVisible         = true,
 			isEnabledWhenHUDHidden   = false,
@@ -656,22 +653,14 @@ function SimpleInspector:draw()
 			-- HUD is hidden, and we respect that
 			-- self.inspectBox:setVisible(false)
 			return
-		elseif g_gameSettings:getValue("ingameMapState") == 4 and self.settings:getValue("displayMode") % 2 ~= 0 and g_currentMission.hud.inputHelp:getVisible() then
-			-- Left side display hide on big map with help open
+		elseif g_gameSettings:getValue("ingameMapState") == 4 and  g_currentMission.hud.inputHelp:getVisible() then
+			-- hide on big map with help open
 			-- self.inspectBox:setVisible(false)
 			return
-		elseif self.settings:getValue("displayMode") == self.D_MODE.HELP_TEXT and g_inGameMenu.hud.inputHelp:getVisible() then
-			-- mode 1 (top left), help is open (not supported yet!),
-			return
-		elseif self.settings:getValue("displayMode") == self.D_MODE.MAP and g_currentMission.hud.chatDisplay:getVisible() then
+		elseif g_currentMission.hud.chatDisplay:getVisible() then
 			-- Over map display and chat is visible, so hide.
 			-- self.inspectBox:setVisible(false)
 			return
-		elseif self.settings:getValue("displayMode") == self.D_MODE.CLOCK and g_currentMission.hud.sideNotifications ~= nil then
-			-- under clock, notificationQueue is not empty.
-			if #g_currentMission.hud.sideNotifications.notificationQueue > 0 then
-				return
-			end
 		else
 			-- we have entries, lets get the overall height of the box and unhide
 			-- self.inspectBox:setVisible(true)
@@ -688,33 +677,10 @@ function SimpleInspector:draw()
 		-- dispTextX/Y is where the text starts (sort of)
 		local dispTextX, dispTextY = self:findOrigin()
 
-		if ( self.settings:getValue("displayMode") == self.D_MODE.CLOCK ) then
-			-- top right (subtract both margins)
-			dispTextX = dispTextX - self.marginWidth
-			dispTextY = dispTextY - self.marginHeight
-			overlayY  = overlayY - overlayH
-		elseif ( self.settings:getValue("displayMode") == self.D_MODE.MAP ) then
-			-- bottom left (add x width, add Y height)
-			dispTextX = dispTextX + self.marginWidth
-			dispTextY = dispTextY - self.marginHeight + overlayH
-		elseif ( self.settings:getValue("displayMode") == self.D_MODE.SPEED ) then
-			-- bottom right (subtract x width, add Y height)
-			dispTextX = dispTextX - self.marginWidth
-			dispTextY = dispTextY - self.marginHeight + overlayH
-		else
-			-- top left (add X width, subtract Y height)
-			dispTextX = dispTextX + self.marginWidth
-			dispTextY = dispTextY - self.marginHeight
-			overlayY  = overlayY - overlayH
-		end
+		dispTextX = dispTextX + self.marginWidth
+		dispTextY = dispTextY - self.marginHeight + overlayH
 
-		if ( self.settings:getValue("displayMode") % 2 == 0 ) then
-			setTextAlignment(RenderText.ALIGN_RIGHT)
-		else
-			setTextAlignment(RenderText.ALIGN_LEFT)
-		end
-
-		
+		setTextAlignment(RenderText.ALIGN_LEFT)
 
 		self.inspectText.posX = dispTextX
 		self.inspectText.posY = dispTextY
@@ -918,7 +884,7 @@ function SimpleInspector:draw()
 		for dispLineNum=1, #outputTextLines do
 			local thisLinePlainText = ""
 
-			for _, dispElement in ipairs(JTSUtil.dispGetLine(outputTextLines, dispLineNum, (self.settings:getValue("displayMode") % 2 == 0) )) do
+			for _, dispElement in ipairs(JTSUtil.dispGetLine(outputTextLines, dispLineNum, false )) do
 				if ( type(dispElement.color) == "table" ) then
 					setTextColor(unpack(dispElement.color))
 				else
@@ -939,35 +905,26 @@ function SimpleInspector:draw()
 			if tmpW > dispTextW then dispTextW = tmpW end
 		end
 
-    local displayX = 0
-    local displayY = 0
+		local displayX = overlayX
+		local displayY = overlayY
 
-		-- update overlay background
-		if self.settings:getValue("displayMode") % 2 == 0 then
-			displayX = overlayX - ( dispTextW + ( 2 * self.inspectText.marginWidth ) )
-      displayY = overlayY
-		else
-			displayX = overlayX
-      displayY = overlayY
-		end
+		-- Set background dimensions dynamically based on text width
+		local padding  = 0.005 -- Add some padding
+		local bgWidth  = dispTextW + (self.inspectText.marginWidth * 2)
+		local bgHeight = overlayH
 
-    -- Set background dimensions dynamically based on text width
-    local padding = 0.005 -- Add some padding
-    local bgWidth = dispTextW + (self.inspectText.marginWidth * 2)
-    local bgHeight = overlayH
+		self.bgScale:setDimension(bgWidth, bgHeight)
+		self.bgScale:setPosition(displayX, displayY)
+		self.bgScale:render()
 
-    self.bgScale:setDimension(bgWidth, bgHeight)
-    self.bgScale:setPosition(displayX, displayY)
-    self.bgScale:render()
+		-- Render left and right parts of the background (optional)
+		self.bgLeft:setDimension(padding, bgHeight)
+		self.bgLeft:setPosition(displayX - padding, displayY)
+		self.bgLeft:render()
 
-    -- Render left and right parts of the background (optional)
-    self.bgLeft:setDimension(padding, bgHeight)
-    self.bgLeft:setPosition(displayX - padding, displayY)
-    self.bgLeft:render()
-
-    self.bgRight:setDimension(padding, bgHeight)
-    self.bgRight:setPosition(displayX + bgWidth, displayY)
-    self.bgRight:render()
+		self.bgRight:setDimension(padding, bgHeight)
+		self.bgRight:setPosition(displayX + bgWidth, displayY)
+		self.bgRight:render()
 
 		-- reset text render to "defaults" to be kind
 		setTextColor(1,1,1,1)
@@ -995,11 +952,7 @@ end
 function SimpleInspector:renderText(x, y, fullTextSoFar, text)
 	local newX = x
 
-	if self.settings:getValue("displayMode") % 2 == 0 then
-		newX = newX - getTextWidth(self.inspectText.size, fullTextSoFar)
-	else
-		newX = newX + getTextWidth(self.inspectText.size, fullTextSoFar)
-	end
+	newX = newX + getTextWidth(self.inspectText.size, fullTextSoFar)
 
 	renderText(newX, y, self.inspectText.size, text)
 	return text .. fullTextSoFar
@@ -1027,41 +980,11 @@ function SimpleInspector:onStartMission(mission)
 end
 
 function SimpleInspector:findOrigin()
-	local tmpX = 0
-	local tmpY = 0
+	local tmpX = 0.01622
+	local tmpY = 0 + self.ingameMap:getHeight() + 0.01622
 
-	if ( self.settings:getValue("displayMode") == self.D_MODE.CLOCK ) then
-		-- top right display
-		-- tmpX, tmpY = self.gameInfoDisplay:getPosition()
-		tmpX = g_hudAnchorRight - 0.004
-		tmpY = g_hudAnchorTop - 0.074
-	elseif ( self.settings:getValue("displayMode") == self.D_MODE.MAP ) then
-		-- Bottom left, correct origin.
-		tmpX = 0.01622
-		tmpY = 0 + self.ingameMap:getHeight() + 0.01622
-		if g_gameSettings:getValue("ingameMapState") > 1 then
-			tmpY = tmpY + 0.032
-		end
-	elseif ( self.settings:getValue("displayMode") == self.D_MODE.SPEED ) then
-		-- bottom right display
-		tmpX = 1
-		tmpY = 0.01622
-		if g_inGameMenu.hud.speedMeter.isVisible then
-			tmpY = tmpY + g_inGameMenu.hud.speedMeter.bgScale.height + 0.032
-			if g_modIsLoaded["FS25_EnhancedVehicle"] or g_modIsLoaded["FS25_guidanceSteering"] then
-				tmpY = tmpY + 0.03
-			end
-		end
-	elseif ( self.settings:getValue("displayMode") == self.D_MODE.CUSTOM ) then
-		tmpX = self.settings:getValue("displayMode5X")
-		tmpY = self.settings:getValue("displayMode5Y")
-	else
-		-- top left display
-		tmpX = 0.014
-		tmpY = 0.945
-		-- if g_inGameMenu.hud.inputHelp.isVisible then
-		-- hidden when help text is visible
-		-- end
+	if g_gameSettings:getValue("ingameMapState") > 1 then
+		tmpY = tmpY + 0.032
 	end
 
 	return tmpX, tmpY
@@ -1073,35 +996,30 @@ function SimpleInspector:createTextBox()
 
 	local baseX, baseY = self:findOrigin()
 
-  local bgPosY = baseY
+	local bgPosY = baseY
 
 	self.marginWidth, self.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({ 8, 8 })
 
-
 	-- Set background dimensions dynamically based on text width
-	local padding = 0.005 -- Add some padding around the text
-	local bgWidth = (self.inspectText.size + padding * 2)
+	local padding  = 0.005 -- Add some padding around the text
+	local bgWidth  = (self.inspectText.size + padding * 2)
 	local bgHeight = 0.02 -- Fixed height for the background
 
 	-- Set location and render the background
 	local bgPosX = baseX - bgWidth * 0.5
 
-  if ( self.settings:getValue("displayMode") % 2 == 0 ) then -- top right
-  	bgPosY = baseY - self.marginHeight
-  else
-    bgPosY = baseY + self.marginHeight
-  end
+	bgPosY = baseY + self.marginHeight
 
 	self.bgScale:setDimension(bgWidth, bgHeight)
 	self.bgScale:setPosition(bgPosX, bgPosY)
-	
+
 	-- Render left and right parts of the background (optional)
 	self.bgLeft:setDimension(padding, bgHeight)
 	self.bgLeft:setPosition(bgPosX - padding, bgPosY)
-	
+
 	self.bgRight:setDimension(padding, bgHeight)
 	self.bgRight:setPosition(bgPosX + bgWidth, bgPosY)
-  
+
 	self.inspectText.marginWidth, self.inspectText.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({self.settings:getValue("setValueTextMarginX"), self.settings:getValue("setValueTextMarginY")})
 	self.inspectText.size = self.gameInfoDisplay:scalePixelToScreenHeight(self.settings:getValue("setValueTextSize"))
 end
@@ -1112,41 +1030,6 @@ function SimpleInspector:delete()
 		self.inspectBox:delete()
 	end
 end
-
--- function SimpleInspector:registerActionEvents()
--- 	local _, reloadConfig = g_inputBinding:registerActionEvent('SimpleInspector_reload_config', self,
--- 		SimpleInspector.actionReloadConfig, false, true, false, true)
--- 	g_inputBinding:setActionEventTextVisibility(reloadConfig, false)
--- 	local _, toggleVisible = g_inputBinding:registerActionEvent('SimpleInspector_toggle_visible', self,
--- 		SimpleInspector.actionToggleVisible, false, true, false, true)
--- 	g_inputBinding:setActionEventTextVisibility(toggleVisible, false)
--- end
-
--- function SimpleInspector:actionReloadConfig()
--- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
-
--- 	thisModEnvironment.logger:print("force reload settings", FS25Log.LOG_LEVEL.INFO, "user_info")
-
--- 	thisModEnvironment.settings:loadSettings()
--- end
-
--- function SimpleInspector:actionToggleAllFarms()
--- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
-
--- 	thisModEnvironment.logger:print("toggle all farms", FS25Log.LOG_LEVEL.INFO, "user_info")
-
--- 	thisModEnvironment.settings:setValue("isEnabledShowUnowned", not thisModEnvironment.settings:getValue("isEnabledShowUnowned"))
--- 	thisModEnvironment.settings:saveSettings()
--- end
-
--- function SimpleInspector:actionToggleVisible()
--- 	local thisModEnvironment = getfenv(0)["g_simpleInspector"]
--- 	thisModEnvironment.logger:print("toggle display", FS25Log.LOG_LEVEL.INFO, "user_info")
-
--- 	thisModEnvironment.settings:setValue("isEnabledVisible", not thisModEnvironment.settings:getValue("isEnabledVisible"))
--- 	thisModEnvironment.settings:saveSettings()
--- end
-
 
 function SimpleInspector.addMenuOption(original, target, id, i18n_title, i18n_tooltip, options, callback)
 	local menuOption = original:clone()
@@ -1187,22 +1070,6 @@ function SimpleInspector.initGui(self)
 		local menuTitle = self.generalSettingsLayout.elements[7]:clone()
 		menuTitle:setText(g_i18n:getText("title_simpleInspector"))
 		self.generalSettingsLayout:addElement(menuTitle)
-
-		self.menuOption_DisplayMode = SimpleInspector.addMenuOption(
-			self.generalSettingsLayout.elements[8],
-			g_simpleInspector,
-			"simpleInspector_DisplayMode",
-			"setting_simpleInspector_DisplayMode",
-			"toolTip_simpleInspector_DisplayMode",
-			{
-				g_i18n:getText("setting_simpleInspector_DisplayMode1"),
-				g_i18n:getText("setting_simpleInspector_DisplayMode2"),
-				g_i18n:getText("setting_simpleInspector_DisplayMode3")
-				-- g_i18n:getText("setting_simpleInspector_DisplayMode4")
-			},
-			"onMenuOptionChanged_DisplayMode"
-		)
-		self.generalSettingsLayout:addElement(self.menuOption_DisplayMode)
 
 		for _, thisOptionName in ipairs(unitOptions) do
 			-- Boolean style options
@@ -1264,7 +1131,6 @@ function SimpleInspector.initGui(self)
 	end
 
 	-- Set Current Values
-	self.menuOption_DisplayMode.elements[1]:setState(g_simpleInspector.settings:getValue("displayMode"))
 	self.menuOption_SolidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledSolidUnit"))
 	self.menuOption_LiquidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledLiquidUnit"))
 
@@ -1290,11 +1156,6 @@ end
 function SimpleInspector:onMenuOptionChanged_setValueTextSize(state)
 	self.settings:setValue("setValueTextSize", g_simpleInspector.menuTextSizes[state])
 	self.inspectText.size = self.gameInfoDisplay:scalePixelToScreenHeight(self.settings:getValue("setValueTextSize"))
-	self.settings:saveSettings()
-end
-
-function SimpleInspector:onMenuOptionChanged_DisplayMode(state)
-	self.settings:setValue("displayMode", state)
 	self.settings:saveSettings()
 end
 

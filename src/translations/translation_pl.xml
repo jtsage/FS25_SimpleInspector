@@ -43,12 +43,6 @@
 	<text name="toolTip_simpleInspector_ShowCPWaypoints" text="Gdy włączone, wyświetli aktualną i całkowitą liczbę punktów trasy, gdy Courseplay kontroluje pojazd." />
 	<text name="setting_simpleInspector_TextBold"        text="Użyj pogrubionej czcionki" />
 	<text name="toolTip_simpleInspector_TextBold"        text="Gdy włączone, użyje pogrubionej czcionki na nakładce." />
-	<text name="setting_simpleInspector_DisplayMode"     text="Pozycja nakładki" />
-	<text name="toolTip_simpleInspector_DisplayMode"     text="Pozycja nakładki z informacjami." />
-	<text name="setting_simpleInspector_DisplayMode1"    text="Lewy górny róg (pod oknem pomocy)" />
-	<text name="setting_simpleInspector_DisplayMode2"    text="Prawy górny róg (pod zegarem)" />
-	<text name="setting_simpleInspector_DisplayMode3"    text="Lewy dolny róg (nad minimapą)" />
-	<text name="setting_simpleInspector_DisplayMode4"    text="Prawy dolny róg (nad prędkościomierzem)" />
 	<text name="text_simpleInspector_kph"                text="km/h" />
 	<text name="text_simpleInspector_mph"                text="mph" />
 	<text name="setting_simpleInspector_ShowADTime"      text="Pokaż pozostały czas AutoDrive" />

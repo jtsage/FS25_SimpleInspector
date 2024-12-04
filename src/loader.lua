@@ -1,6 +1,6 @@
 -- Loader for SimpleInspector
 
-local debug        = false
+local debug        = true
 local modDirectory = g_currentModDirectory or ""
 local modName      = g_currentModName or "unknown"
 local modEnvironment

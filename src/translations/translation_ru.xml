@@ -43,12 +43,6 @@
 	<text name="toolTip_simpleInspector_ShowCPWaypoints" text="Если включено, показывается текущее и общее количество путевых точек, когда CoursePlay управляет транспортным средством." />
 	<text name="setting_simpleInspector_TextBold"        text="Жирный шрифт" />
 	<text name="toolTip_simpleInspector_TextBold"        text="Если включено, будет использоваться жирный шрифт для всего дисплея." />
-	<text name="setting_simpleInspector_DisplayMode"     text="Размещение дисплея" />
-	<text name="toolTip_simpleInspector_DisplayMode"     text="Место размещения дисплея на экране" />
-	<text name="setting_simpleInspector_DisplayMode1"    text="Вверху слева" />
-	<text name="setting_simpleInspector_DisplayMode2"    text="Вверху справа" />
-	<text name="setting_simpleInspector_DisplayMode3"    text="Внизу слева" />
-	<text name="setting_simpleInspector_DisplayMode4"    text="Внизу справа" />
 	<text name="text_simpleInspector_kph"                text="км/ч" />
 	<text name="text_simpleInspector_mph"                text="миль/ч" />
 	<text name="setting_simpleInspector_ShowADTime" text="Показывать оставшееся время AutoDrive" />

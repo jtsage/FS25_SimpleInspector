@@ -16,7 +16,6 @@ unknowingly using an old version.  For "official" releases, please use the relea
 
 ## Features
 
-* 3 on screen placement locations - each corner of the display
 * Just your vehicles or all vehicles
 * Speed of vehicles
 * Fuel level of vehicles
@@ -31,14 +30,6 @@ unknowingly using an old version.  For "official" releases, please use the relea
 All options are set via a xml file in `modSettings/FS25_SimpleInspector/savegame##/simpleInspector.xml`
 
 Most view options can be set in the in-game settings menu (scroll down)
-
-### displayMode (configurable in the game settings menu)
-
-* __1__ - Top left, under the vehicle schema. Hidden if help menu visible
-* __2__ - Top right, under the clock.  
-* __3__ - Bottom left, over the map (if shown). Hidden if large map and key bindings are visible together.
-* __4__ - Bottom right, over the speedometer - not currently supported
-* __5__ - Custom placement.  Set X/Y origin point in settings XML file as well.
 
 ### in-game configurable
 

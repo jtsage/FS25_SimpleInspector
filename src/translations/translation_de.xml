@@ -43,12 +43,6 @@
 	<text name="toolTip_simpleInspector_ShowCPWaypoints" text="Wenn diese Option aktiviert ist, werden die aktuelle und die Gesamtanzahl der Wegpunkte angezeigt, wenn CoursePlay ein Fahrzeug steuert." />
 	<text name="setting_simpleInspector_TextBold"        text="Fettgedruckte Schrift verwenden" />
 	<text name="toolTip_simpleInspector_TextBold"        text="Wenn diese Option aktiviert ist, wird in der gesamten Anzeige fetter Text verwendet." />
-	<text name="setting_simpleInspector_DisplayMode"     text="Anzeigemodus" />
-	<text name="toolTip_simpleInspector_DisplayMode"     text="Position der Overlay-Anzeige" />
-	<text name="setting_simpleInspector_DisplayMode1"    text="Oben links, unter Hilfe" />
-	<text name="setting_simpleInspector_DisplayMode2"    text="Oben rechts, unter der Uhr" />
-	<text name="setting_simpleInspector_DisplayMode3"    text="Unten links, über Karte" />
-	<text name="setting_simpleInspector_DisplayMode4"    text="Unten rechts, über dem Tachometer" />
 	<text name="text_simpleInspector_kph"                text="km/h" />
 	<text name="text_simpleInspector_mph"                text="mph" />
 	<text name="setting_simpleInspector_ShowADTime" text="Verbleibende AutoDrive-Zeit anzeigen" />

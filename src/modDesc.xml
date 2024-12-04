@@ -8,7 +8,6 @@
         <en><![CDATA[Simple Inspector shows a HUD overlay with vehicle statistics
 
 Display Options:
- - 2 on screen placement locations - left hand corners of the display
  - Just your vehicles or all vehicles
  - Speed of vehicles
  - Fuel level of vehicles
@@ -21,7 +20,6 @@ Display Options:
         <de><![CDATA[Einfacher Inspektor zeigt ein HUD-Overlay mit Fahrzeugstatistiken
 
 Anzeigeoptionen:
- - 2 Positionen für die Platzierung auf dem Bildschirm - linke Ecken des Bildschirms 
  - jede Ecke der Anzeige 
  - nur Ihre Fahrzeuge oder alle Fahrzeuge 
  - Geschwindigkeit der Fahrzeuge 
@@ -42,16 +40,4 @@ Anzeigeoptionen:
     </extraSourceFiles>
     <l10n filenamePrefix="translations/translation"/>
 
-    <!-- <actions>
-        <action name="SimpleInspector_reload_config" />
-        <action name="SimpleInspector_toggle_visible" />
-    </actions>
-    <inputBinding>
-        <actionBinding action="SimpleInspector_reload_config">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_lalt KEY_KP_9" axisComponent="+" neutralInput="0" index="1" />
-        </actionBinding>
-        <actionBinding action="SimpleInspector_toggle_visible">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_KP_9" axisComponent="+" neutralInput="0" index="1" />
-        </actionBinding>
-    </inputBinding> -->
 </modDesc>
