@@ -149,7 +149,10 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		[FillType.LIME]             = true,
 		[FillType.SILAGE_ADDITIVE]  = true,
 		[FillType.LIQUIDFERTILIZER] = true,
-		[FillType.HERBICIDE]        = true
+		[FillType.HERBICIDE]        = true,
+		[FillType.BALE_NET]         = true,
+		[FillType.BALE_TWINE]       = true,
+		[FillType.BALE_WRAP]        = true
 	}
 	-- cSpell: enable
 
