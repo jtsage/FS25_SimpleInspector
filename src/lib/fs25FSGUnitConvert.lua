@@ -3,15 +3,73 @@ FS25FSGUnits = {}
 
 local FS25FSGUnits_mt = Class(FS25FSGUnits)
 
-function FS25FSGUnits:new(logger)
+FS25FSGUnits.unit_types = {}
+FS25FSGUnits.unit_types.SOLID  = 1
+FS25FSGUnits.unit_types.LIQUID = 2
+FS25FSGUnits.unit_types.NONE   = 3
+
+FS25FSGUnits.unitsToIndex = {
+	LITER   = 1,
+	BUSHEL  = 2,
+	C_METER = 3,
+	C_FOOT  = 4,
+	C_YARD  = 5,
+	KG      = 6,
+	OZ      = 7,
+	LBS     = 8,
+	CWT     = 9,
+	MT      = 10,
+	T       = 11,
+	F_OZ    = 12,
+	GAL     = 13,
+}
+
+FS25FSGUnits.units = {
+	[FS25FSGUnits.unitsToIndex.LITER]   = { precision = 0, isWeight = false, text = "unit_literShort",     factor = 1 },
+	[FS25FSGUnits.unitsToIndex.BUSHEL]  = { precision = 2, isWeight = false, text = "unit_bushelsShort",   factor = 0.028378 },
+	[FS25FSGUnits.unitsToIndex.C_METER] = { precision = 3, isWeight = false, text = "unit_cubicShort",    factor = 0.001 },
+	[FS25FSGUnits.unitsToIndex.C_FOOT]  = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_cubicFoot",   factor = 0.035315 },
+	[FS25FSGUnits.unitsToIndex.C_YARD]  = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_cubicYard",   factor = 0.001308},
+	[FS25FSGUnits.unitsToIndex.KG]      = { precision = 0, isWeight = true,  text = "unit_kg",    factor = 1 },
+	[FS25FSGUnits.unitsToIndex.OZ]      = { precision = 0, isWeight = true,  text = "unit_fsgUnitConvert_ounce",    factor = 35.27396 },
+	[FS25FSGUnits.unitsToIndex.LBS]     = { precision = 0, isWeight = true,  text = "unit_fsgUnitConvert_poundWeight",   factor = 2.204623 },
+	[FS25FSGUnits.unitsToIndex.CWT]     = { precision = 2, isWeight = true,  text = "unit_fsgUnitConvert_hundredWeight",   factor = 0.022046 },
+	[FS25FSGUnits.unitsToIndex.MT]      = { precision = 3, isWeight = true,  text = "unit_tonsShort",    factor = 0.001 },
+	[FS25FSGUnits.unitsToIndex.T]       = { precision = 3, isWeight = true,  text = "unit_fsgUnitConvert_imperialTon",     factor = 0.0011023 },
+	[FS25FSGUnits.unitsToIndex.F_OZ]    = { precision = 0, isWeight = false, text = "unit_fsgUnitConvert_fluidOunce", factor = 33.814023 },
+	[FS25FSGUnits.unitsToIndex.GAL]     = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_fluidGallon",   factor = 0.264172},
+}
+
+FS25FSGUnits.unit_select = {
+	[FS25FSGUnits.unit_types.SOLID] = {
+		FS25FSGUnits.unitsToIndex.LITER,
+		FS25FSGUnits.unitsToIndex.BUSHEL,
+		FS25FSGUnits.unitsToIndex.C_METER,
+		FS25FSGUnits.unitsToIndex.C_FOOT,
+		FS25FSGUnits.unitsToIndex.C_YARD,
+		FS25FSGUnits.unitsToIndex.KG,
+		FS25FSGUnits.unitsToIndex.OZ,
+		FS25FSGUnits.unitsToIndex.LBS,
+		FS25FSGUnits.unitsToIndex.CWT,
+		FS25FSGUnits.unitsToIndex.MT,
+		FS25FSGUnits.unitsToIndex.T,
+	},
+	[FS25FSGUnits.unit_types.LIQUID] = {
+		FS25FSGUnits.unitsToIndex.LITER,
+		FS25FSGUnits.unitsToIndex.F_OZ,
+		FS25FSGUnits.unitsToIndex.GAL,
+		FS25FSGUnits.unitsToIndex.KG,
+		FS25FSGUnits.unitsToIndex.OZ,
+		FS25FSGUnits.unitsToIndex.LBS,
+		FS25FSGUnits.unitsToIndex.CWT,
+		FS25FSGUnits.unitsToIndex.MT,
+		FS25FSGUnits.unitsToIndex.T,
+	}
+}
+
+function FS25FSGUnits:new()
 	local self = setmetatable({}, FS25FSGUnits_mt)
 
-	self.logger = logger
-
-	self.unit_types = {}
-	self.unit_types.SOLID  = 1
-	self.unit_types.LIQUID = 2
-	self.unit_types.NONE   = 3
 
 	-- cSpell: disable
 	self.unit_type_liquid = {
@@ -47,87 +105,26 @@ function FS25FSGUnits:new(logger)
 	}
 	-- cSpell: enable
 
-	self.unitsToIndex = {
-		LITER   = 1,
-		BUSHEL  = 2,
-		C_METER = 3,
-		C_FOOT  = 4,
-		C_YARD  = 5,
-		KG      = 6,
-		OZ      = 7,
-		LBS     = 8,
-		CWT     = 9,
-		MT      = 10,
-		T       = 11,
-		F_OZ    = 12,
-		GAL     = 13,
-	}
-
-	self.units = {
-		[self.unitsToIndex.LITER]   = { precision = 0, isWeight = false, text = "unit_literShort",     factor = 1 },
-		[self.unitsToIndex.BUSHEL]  = { precision = 2, isWeight = false, text = "unit_bushelsShort",   factor = 0.028378 },
-		[self.unitsToIndex.C_METER] = { precision = 3, isWeight = false, text = "unit_cubicShort",    factor = 0.001 },
-		[self.unitsToIndex.C_FOOT]  = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_cubicFoot",   factor = 0.035315 },
-		[self.unitsToIndex.C_YARD]  = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_cubicYard",   factor = 0.001308},
-		[self.unitsToIndex.KG]      = { precision = 0, isWeight = true,  text = "unit_kg",    factor = 1 },
-		[self.unitsToIndex.OZ]      = { precision = 0, isWeight = true,  text = "unit_fsgUnitConvert_ounce",    factor = 35.27396 },
-		[self.unitsToIndex.LBS]     = { precision = 0, isWeight = true,  text = "unit_fsgUnitConvert_poundWeight",   factor = 2.204623 },
-		[self.unitsToIndex.CWT]     = { precision = 2, isWeight = true,  text = "unit_fsgUnitConvert_hundredWeight",   factor = 0.022046 },
-		[self.unitsToIndex.MT]      = { precision = 3, isWeight = true,  text = "unit_tonsShort",    factor = 0.001 },
-		[self.unitsToIndex.T]       = { precision = 3, isWeight = true,  text = "unit_fsgUnitConvert_imperialTon",     factor = 0.0011023 },
-		[self.unitsToIndex.F_OZ]    = { precision = 0, isWeight = false, text = "unit_fsgUnitConvert_fluidOunce", factor = 33.814023 },
-		[self.unitsToIndex.GAL]     = { precision = 2, isWeight = false, text = "unit_fsgUnitConvert_fluidGallon",   factor = 0.264172},
-	}
-
-	self.unit_select = {
-		[self.unit_types.SOLID] = {
-			self.unitsToIndex.LITER,
-			self.unitsToIndex.BUSHEL,
-			self.unitsToIndex.C_METER,
-			self.unitsToIndex.C_FOOT,
-			self.unitsToIndex.C_YARD,
-			self.unitsToIndex.KG,
-			self.unitsToIndex.OZ,
-			self.unitsToIndex.LBS,
-			self.unitsToIndex.CWT,
-			self.unitsToIndex.MT,
-			self.unitsToIndex.T,
-		},
-		[self.unit_types.LIQUID] = {
-			self.unitsToIndex.LITER,
-			self.unitsToIndex.F_OZ,
-			self.unitsToIndex.GAL,
-			self.unitsToIndex.KG,
-			self.unitsToIndex.OZ,
-			self.unitsToIndex.LBS,
-			self.unitsToIndex.CWT,
-			self.unitsToIndex.MT,
-			self.unitsToIndex.T,
-		}
-	}
-
-	--self.logger:printVariable(self.unit_select, FS25Log.LOG_LEVEL.VERBOSE, "units:unit_select")
-
 	return self
 end
 
-function FS25FSGUnits:getSettingsTexts(unitType)
+function FS25FSGUnits.getSettingsTexts(unitType)
 	-- Args:
 	--  - unitType : FS25FSGUnits.unit_types.SOLID or FS25FSGUnits.unit_types.LIQUID
 	local settingsTable = {}
 
-	if self.unit_select[unitType] == nil then
+	if FS25FSGUnits.unit_select[unitType] == nil then
 		return settingsTable
 	end
 
-	for _, typeIdx in ipairs(self.unit_select[unitType]) do
+	for _, typeIdx in ipairs(FS25FSGUnits.unit_select[unitType]) do
 		local thisUnitMeasure = g_i18n:getText('unit_fsgUnitConvert_Volume')
 
-		if self.units[typeIdx].isWeight then
+		if FS25FSGUnits.units[typeIdx].isWeight then
 			thisUnitMeasure = g_i18n:getText('unit_fsgUnitConvert_Weight')
 		end
 
-		local thisUnit = thisUnitMeasure .. " | " .. g_i18n:getText(self.units[typeIdx].text)
+		local thisUnit = thisUnitMeasure .. " | " .. g_i18n:getText(FS25FSGUnits.units[typeIdx].text)
 		table.insert(settingsTable, thisUnit)
 	end
 
@@ -138,18 +135,18 @@ function FS25FSGUnits:getUnitType(fillTypeIdx)
 	-- Args:
 	--  - fillTypeIdx : fillType index.  Same as to g_fillTypeManager:getFillTypeByIndex()
 	if self.unit_type_bales[fillTypeIdx] ~= nil then
-		return self.unit_types.NONE
+		return FS25FSGUnits.unit_types.NONE
 	end
 
 	if self.unit_type_liquid[fillTypeIdx] ~= nil then
-		return self.unit_types.LIQUID
+		return FS25FSGUnits.unit_types.LIQUID
 	end
 
 	if g_fillTypeManager:getIsFillTypeInCategory(fillTypeIdx, 'ANIMAL') or g_fillTypeManager:getIsFillTypeInCategory(fillTypeIdx, 'HORSE') then
-		return self.unit_types.NONE
+		return FS25FSGUnits.unit_types.NONE
 	end
 
-	return self.unit_types.SOLID
+	return FS25FSGUnits.unit_types.SOLID
 end
 
 function FS25FSGUnits:scaleFillTypeLevel(fillTypeIdx, fillLevel, unitIdxSolid, unitIdxLiquid, showUnit, showFormat)
@@ -167,18 +164,18 @@ function FS25FSGUnits:scaleFillTypeLevel(fillTypeIdx, fillLevel, unitIdxSolid, u
 	local unitType     = self:getUnitType(fillTypeIdx)
 	local realUnitIdx  = 1
 
-	if unitType == self.unit_types.NONE then
+	if unitType == FS25FSGUnits.unit_types.NONE then
 		return fillLevel
 	end
 
-	if unitType == self.unit_types.LIQUID then
-		realUnitIdx = self.unit_select[unitType][unitIdxLiquid]
+	if unitType == FS25FSGUnits.unit_types.LIQUID then
+		realUnitIdx = FS25FSGUnits.unit_select[unitType][unitIdxLiquid]
 	end
-	if unitType == self.unit_types.SOLID then
-		realUnitIdx = self.unit_select[unitType][unitIdxSolid]
+	if unitType == FS25FSGUnits.unit_types.SOLID then
+		realUnitIdx = FS25FSGUnits.unit_select[unitType][unitIdxSolid]
 	end
 
-	local unitData        = self.units[realUnitIdx]
+	local unitData        = FS25FSGUnits.units[realUnitIdx]
 	local returnFillLevel = fillLevel
 
 	if unitData.isWeight then

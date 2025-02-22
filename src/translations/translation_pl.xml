@@ -9,8 +9,8 @@
 	<text name="title_simpleInspector"                   text="Simple Inspector" />
 	<text name="setting_simpleInspector_Visible"         text="Widoczność nakładki" />
 	<text name="toolTip_simpleInspector_Visible"         text="Gdy włączone, nakładka jest widoczna." />
-	<text name="setting_simpleInspector_TextSize"        text="Wielkość czcionki" />
-	<text name="toolTip_simpleInspector_TextSize"        text="Rozmiar czcionki na nakładce, w względnych pikselach." />
+	<text name="setting_simpleInspector_SetValueTextSize"        text="Wielkość czcionki" />
+	<text name="toolTip_simpleInspector_SetValueTextSize"        text="Rozmiar czcionki na nakładce, w względnych pikselach." />
 	<text name="setting_simpleInspector_AlphaSort"       text="Sortuj alfabetycznie" />
 	<text name="toolTip_simpleInspector_AlphaSort"       text="Gdy włączone, sortuj listę alfabetycznie, w przeciwnym razie użyj kolejności teleportacji." />
 	<text name="setting_simpleInspector_ShowAll"         text="Pokaż wszystkie pojazdy" />

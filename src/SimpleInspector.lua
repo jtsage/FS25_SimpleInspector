@@ -5,15 +5,40 @@
 -- source: https://github.com/jtsage/FS25_Simple_Inspector
 -- credits: HappyLooser/VehicleInspector for the isOnField logic, and some pointers on where to find info
 
-SimpleInspector= {}
+SimpleInspector = {}
 
 local SimpleInspector_mt = Class(SimpleInspector)
+
+SimpleInspector.CONTROLS = {}
+SimpleInspector.menuTextSizes = { 8, 10, 12, 14, 16, 18, 20 }
+
+local inGameMenu = g_gui.screenControllers[InGameMenu]
+local settingsPage = inGameMenu.pageSettings
+local settingsLayout = settingsPage.generalSettingsLayout
+
+SimpleInspector.name = settingsPage.name
+
+
+local boolMenuOptions = {
+	"Visible", "WhenHUDHidden", "AlphaSort", "ShowAll", "ShowUnowned", "ShowPlayer", "ShowBeacon", "ShowFuel", "ShowDef", "ShowSpeed", "ShowDamage",
+	"ShowFills", "ShowFillPercent", "ShowField", "ShowFieldNum", "PadFieldNum",
+	"ShowCPWaypoints", "ShowADTime", "ShowCPTime","TextBold"
+}
+
+local textSizeTexts = { "8px", "10px", "12px", "14px", "16px", "18px", "20px" }
+
+source(g_currentModDirectory .. 'lib/fs25FSGUnitConvert.lua')
 
 function SimpleInspector:new(mission, modDirectory, modName, logger)
 	local self = setmetatable({}, SimpleInspector_mt)
 
+	if logger ~= nil and logger.printVariable ~= nil and type(logger.printVariable) == "function" then
+		self.logger = logger
+	else
+		self.logger = { print = function() return end, printVariable = function() return end }
+	end
+
 	self.myName            = "SimpleInspector"
-	self.logger            = logger
 	self.isServer          = mission:getIsServer()
 	self.isClient          = mission:getIsClient()
 	self.isMPGame          = g_currentMission.missionDynamicInfo.isMultiplayer
@@ -26,9 +51,8 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.ingameMap         = mission.hud.ingameMap
 
 	source(modDirectory .. 'lib/fs25ModPrefSaver.lua')
-	source(modDirectory .. 'lib/fs25FSGUnitConvert.lua')
 
-	self.convert  = FS25FSGUnits:new(self.logger)
+	self.convert  = FS25FSGUnits:new()
 
 	self.settings = FS25PrefSaver:new(
 		"FS25_SimpleInspector",
@@ -108,7 +132,6 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 	self.inspectText            = {}
 	self.boxBGColor             = { 544, 20, 200, 44 }
 	self.bgName                 = g_baseHUDFilename
-	self.menuTextSizes          = { 8, 10, 12, 14, 16, 18, 20 }
 
 	local modDesc       = loadXMLFile("modDesc", modDirectory .. "modDesc.xml");
 	self.version        = getXMLString(modDesc, "modDesc.version");
@@ -201,18 +224,18 @@ function SimpleInspector:new(mission, modDirectory, modName, logger)
 		[8] = g_i18n:getText('unit_fsgDirection_N'),
 	}
 
-  -- Setup the background
-  local colorBackground = HUD.COLOR.BACKGROUND
-  local r, g, b, a = unpack(colorBackground)
-  self.bgScale = g_overlayManager:createOverlay("gui.gameInfo_middle", 0, 0, 0, 0)
-  self.bgScale:setColor(r, g, b, a)
-  self.bgLeft = g_overlayManager:createOverlay("gui.gameInfo_left", 0, 0, 0, 0)
-  self.bgLeft:setColor(r, g, b, a)
-  self.bgRight = g_overlayManager:createOverlay("gui.gameInfo_right", 0, 0, 0, 0)
-  self.bgRight:setColor(r, g, b, a)
-  self.icons = {}
+	-- Setup the background
+	local colorBackground = HUD.COLOR.BACKGROUND
+	local r, g, b, a = unpack(colorBackground)
+	self.bgScale = g_overlayManager:createOverlay("gui.gameInfo_middle", 0, 0, 0, 0)
+	self.bgScale:setColor(r, g, b, a)
+	self.bgLeft = g_overlayManager:createOverlay("gui.gameInfo_left", 0, 0, 0, 0)
+	self.bgLeft:setColor(r, g, b, a)
+	self.bgRight = g_overlayManager:createOverlay("gui.gameInfo_right", 0, 0, 0, 0)
+	self.bgRight:setColor(r, g, b, a)
+	self.icons = {}
 
-	self.logger:print(":new() Initialized", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
+	-- self.logger:print(":new() Initialized", 5, "method_track")
 
 	return self
 end
@@ -434,7 +457,7 @@ function SimpleInspector:getSingleFill(vehicle, theseFills)
 					end
 				end
 
-				if fillLevel > 0 then
+				if fillLevel > 0 and fillType ~= nil then
 					if checkInvert then isInverted = self.fill_invert_types[fillType] ~= nil end
 
 					if ( theseFills[fillType] ~= nil ) then
@@ -633,7 +656,7 @@ function SimpleInspector:updateVehicles()
 		end
 	end
 
-	self.logger:printVariable(new_data_table, FS25Log.LOG_LEVEL.VERBOSE, "display_data", 3)
+	-- self.logger:printVariable(new_data_table, 5, "display_data", 3)
 
 	self.display_data = {unpack(new_data_table)}
 end
@@ -882,7 +905,7 @@ function SimpleInspector:draw()
 			end
 		end
 
-		self.logger:printVariable(outputTextLines, FS25Log.LOG_LEVEL.VERBOSE, "outputTextLines", 3)
+		-- self.logger:printVariable(outputTextLines, 5, "outputTextLines", 3)
 
 		for dispLineNum=1, #outputTextLines do
 			local thisLinePlainText = ""
@@ -964,7 +987,7 @@ end
 function SimpleInspector:onStartMission(mission)
 	-- Load the mod, make the box that info lives in.
 
-	self.logger:print(JTSUtil.qConcat("Loaded - version : ", self.version), FS25Log.LOG_LEVEL.INFO, "user_info")
+	Logging.info("SimpleInspector version %s loaded", self.version)
 
 	if not self.isClient then
 		return
@@ -974,7 +997,7 @@ function SimpleInspector:onStartMission(mission)
 	self.settings:loadSettings()
 	self.settings:saveSettings()
 
-	self.logger:print(":onStartMission()", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
+	-- self.logger:print(":onStartMission()", 5, "method_track")
 
 	-- self:createTextBox()
 	self.marginWidth, self.marginHeight = self.gameInfoDisplay:scalePixelToScreenVector({ 8, 8 })
@@ -995,7 +1018,7 @@ end
 
 function SimpleInspector:createTextBox()
 	-- make the box we live in.
-	self.logger:print(":createTextBox()", FS25Log.LOG_LEVEL.VERBOSE, "method_track")
+	-- self.logger:print(":createTextBox()", 5, "method_track")
 
 	local baseX, baseY = self:findOrigin()
 
@@ -1034,147 +1057,163 @@ function SimpleInspector:delete()
 	end
 end
 
-function SimpleInspector.addMenuOption(original, target, id, i18n_title, i18n_tooltip, options, callback)
-	local menuOption = original:clone()
+function SimpleInspector.addMenuOption(boolType, id, options, callback)
+	local original
+	if boolType then
+		original = settingsPage.checkWoodHarvesterAutoCutBox
+	else
+		original = settingsPage.multiVolumeVoiceBox
+	end
 
-	menuOption.target = target
-	menuOption.id     = id
+	local function updateFocusIds(element)
+		if not element then
+			return
+		end
+		element.focusId = FocusManager:serveAutoFocusId()
+		for _, child in pairs(element.elements) do
+			updateFocusIds(child)
+		end
+	end
 
-	menuOption.elements[1].target = target
-	menuOption.elements[1].id = id
-	menuOption.elements[1]:setCallback("onClickCallback", callback)
-	menuOption.elements[1]:setDisabled(false)
+	local menuOptionBox = original:clone(settingsLayout)
+	if not menuOptionBox then
+		print("could not create menu option box")
+		return
+	end
+	menuOptionBox.id = id .. "box"
 
-	local settingTitle = menuOption.elements[2]
-	local toolTip      = menuOption.elements[1].elements[1]
+	local menuOption = menuOptionBox.elements[1]
+	if not menuOption then
+		print("could not create menu option")
+		return
+	end
 
-	menuOption.elements[1]:setTexts({unpack(options)})
-	settingTitle:setText(g_i18n:getText(i18n_title))
-	toolTip:setText(g_i18n:getText(i18n_tooltip))
+	menuOption.target = SimpleInspector
+	menuOption.id = id
+	menuOption:setCallback("onClickCallback", callback)
+	menuOption:setDisabled(false)
 
+	local toolTip      = menuOption.elements[1]
+	toolTip:setText(g_i18n:getText("toolTip_" .. id))
+
+	local settingTitle = menuOptionBox.elements[2]
+	settingTitle:setText(g_i18n:getText("setting_" .. id))
+
+	menuOption:setTexts({unpack(options)})
+
+	SimpleInspector.CONTROLS[id] = menuOption
+
+	updateFocusIds(menuOptionBox)
+	table.insert(settingsPage.controlsList, menuOptionBox)
+	
 	return menuOption
 end
 
-function SimpleInspector.initGui(self)
-
-	local boolMenuOptions = {
-		"Visible", "WhenHUDHidden", "AlphaSort", "ShowAll", "ShowUnowned", "ShowPlayer", "ShowBeacon", "ShowFuel", "ShowDef", "ShowSpeed", "ShowDamage",
-		"ShowFills", "ShowFillPercent", "ShowField", "ShowFieldNum", "PadFieldNum",
-		"ShowCPWaypoints", "ShowADTime", "ShowCPTime","TextBold"
-	}
-	local unitOptions = {
-		"SolidUnit", "LiquidUnit"
-	}
-
-	if not g_simpleInspector.createdGUI then
-		-- Create controls -- Skip if we've already done this once
-		g_simpleInspector.createdGUI = true
-
-		local menuTitle = self.generalSettingsLayout.elements[7]:clone()
-		menuTitle:setText(g_i18n:getText("title_simpleInspector"))
-		self.generalSettingsLayout:addElement(menuTitle)
-
-		for _, thisOptionName in ipairs(unitOptions) do
-			-- Boolean style options
-			local thisFullOptName = "menuOption_" .. thisOptionName
-			local unitType        = g_simpleInspector.convert.unit_types.SOLID
-
-			if thisOptionName == "LiquidUnit" then
-				unitType = g_simpleInspector.convert.unit_types.LIQUID
-			end
-			
-			local theseOptions    = g_simpleInspector.convert:getSettingsTexts(unitType)
-
-			self[thisFullOptName] = SimpleInspector.addMenuOption(
-				self.generalSettingsLayout.elements[8],
-				g_simpleInspector,
-				"simpleInspector_" .. thisOptionName,
-				"setting_simpleInspector_" .. thisOptionName,
-				"toolTip_simpleInspector_" .. thisOptionName,
-				theseOptions,
-				"onMenuOptionChanged_unitOpt"
-			)
-			self.generalSettingsLayout:addElement(self[thisFullOptName])
-		end
-
-
-		for _, thisOptionName in ipairs(boolMenuOptions) do
-			-- Boolean style options
-			local thisFullOptName = "menuOption_" .. thisOptionName
-			self[thisFullOptName] = SimpleInspector.addMenuOption(
-				self.generalSettingsLayout.elements[1],
-				g_simpleInspector,
-				"simpleInspector_" .. thisOptionName,
-				"setting_simpleInspector_" .. thisOptionName,
-				"toolTip_simpleInspector_" .. thisOptionName,
-				{
-					g_i18n:getText("ui_no"),
-					g_i18n:getText("ui_yes")
-				},
-				"onMenuOptionChanged_boolOpt"
-			)
-			self.generalSettingsLayout:addElement(self[thisFullOptName])
-		end
-
-		local textSizeTexts = {}
-		for _, size in ipairs(g_simpleInspector.menuTextSizes) do
-			table.insert(textSizeTexts, tostring(size) .. " px")
-		end
-
-		self.menuOption_TextSize = SimpleInspector.addMenuOption(
-			self.generalSettingsLayout.elements[8],
-			g_simpleInspector,
-			"simpleInspector_setValueTextSize",
-			"setting_simpleInspector_TextSize",
-			"toolTip_simpleInspector_TextSize",
-			textSizeTexts,
-			"onMenuOptionChanged_setValueTextSize"
+InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameOpen, function()
+	for _, thisOptionName in ipairs(boolMenuOptions) do
+		SimpleInspector.CONTROLS["simpleInspector_" .. thisOptionName]:setIsChecked(
+			g_simpleInspector.settings:getValue("isEnabled" .. thisOptionName)
 		)
-		self.generalSettingsLayout:addElement(self.menuOption_TextSize)
 	end
 
-	-- Set Current Values
-	self.menuOption_SolidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledSolidUnit"))
-	self.menuOption_LiquidUnit.elements[1]:setState(g_simpleInspector.settings:getValue("isEnabledLiquidUnit"))
-
-	for _, thisOption in ipairs(boolMenuOptions) do
-		local thisMenuOption = "menuOption_" .. thisOption
-		local thisRealOption = "isEnabled" .. thisOption
-		self[thisMenuOption].elements[1]:setIsChecked(g_simpleInspector.settings:getValue(thisRealOption))
-	end
+	SimpleInspector.CONTROLS["simpleInspector_SolidUnit"]:setState(g_simpleInspector.settings:getValue("isEnabledSolidUnit"))
+	SimpleInspector.CONTROLS["simpleInspector_LiquidUnit"]:setState(g_simpleInspector.settings:getValue("isEnabledLiquidUnit"))
 
 	local textSizeState = 3 -- backup value for it set odd in the xml.
-	for idx, textSize in ipairs(g_simpleInspector.menuTextSizes) do
+	for idx, textSize in ipairs(SimpleInspector.menuTextSizes) do
 		if g_simpleInspector.settings:getValue("setValueTextSize") == textSize then
 			textSizeState = idx
 		end
 	end
-	self.menuOption_TextSize.elements[1]:setState(textSizeState)
+	SimpleInspector.CONTROLS["simpleInspector_setValueTextSize"]:setState(textSizeState)
 
-	-- Refresh the menu so new buttons show
-	self.generalSettingsLayout:invalidateLayout()
-	self:updateGameSettings()
-end
+end)
 
 function SimpleInspector:onMenuOptionChanged_setValueTextSize(state)
-	self.settings:setValue("setValueTextSize", g_simpleInspector.menuTextSizes[state])
-	self.inspectText.size = self.gameInfoDisplay:scalePixelToScreenHeight(self.settings:getValue("setValueTextSize"))
-	self.settings:saveSettings()
+	g_simpleInspector.settings:setValue("setValueTextSize", SimpleInspector.menuTextSizes[state])
+	g_simpleInspector.inspectText.size = g_simpleInspector.gameInfoDisplay:scalePixelToScreenHeight(g_simpleInspector.settings:getValue("setValueTextSize"))
+	g_simpleInspector.settings:saveSettings()
 end
 
 function SimpleInspector:onMenuOptionChanged_boolOpt(state, info)
-	self.settings:setValue(
+	g_simpleInspector.settings:setValue(
 		"isEnabled" .. string.sub(info.id, (#"simpleInspector_"+1)),
 		state == CheckedOptionElement.STATE_CHECKED
 	)
-	self.settings:saveSettings()
+	g_simpleInspector.settings:saveSettings()
 end
 
 function SimpleInspector:onMenuOptionChanged_unitOpt(state, info)
-	self.settings:setValue(
+	g_simpleInspector.settings:setValue(
 		"isEnabled" .. string.sub(info.id, (#"simpleInspector_"+1)),
 		state
 	)
-	self.settings:saveSettings()
+	g_simpleInspector.settings:saveSettings()
 end
+
+local sectionTitle = nil
+for idx, elem in ipairs(settingsLayout.elements) do
+	if elem.name == "sectionHeader" then
+		sectionTitle = elem:clone(settingsLayout)
+		break
+	end
+end
+if sectionTitle then
+	sectionTitle:setText(g_i18n:getText("title_simpleInspector"))
+	sectionTitle.focusId = FocusManager:serveAutoFocusId()
+	table.insert(settingsPage.controlsList, sectionTitle)
+	SimpleInspector.CONTROLS[sectionTitle.name] = sectionTitle
+else
+	local title = TextElement.new()
+	title:applyProfile("fs25_settingsSectionHeader", true)
+	title:setText(g_i18n:getText("title_simpleInspector"))
+	title.name = "sectionHeader"
+	settingsLayout:addElement(title)
+end
+
+for _, thisOptionName in ipairs(boolMenuOptions) do
+	-- Boolean style options
+	SimpleInspector.addMenuOption(
+		true,
+		"simpleInspector_" .. thisOptionName,
+		{ g_i18n:getText("ui_off"), g_i18n:getText("ui_on") },
+		"onMenuOptionChanged_boolOpt"
+	)
+end
+
+SimpleInspector.addMenuOption(
+	false,
+	"simpleInspector_SolidUnit",
+	FS25FSGUnits.getSettingsTexts(FS25FSGUnits.unit_types.SOLID),
+	"onMenuOptionChanged_unitOpt"
+)
+SimpleInspector.addMenuOption(
+	false,
+	"simpleInspector_LiquidUnit",
+	FS25FSGUnits.getSettingsTexts(FS25FSGUnits.unit_types.LIQUID),
+	"onMenuOptionChanged_unitOpt"
+)
+SimpleInspector.addMenuOption(
+	false,
+	"simpleInspector_setValueTextSize",
+	textSizeTexts,
+	"onMenuOptionChanged_setValueTextSize"
+)
+settingsLayout:invalidateLayout()
+
+FocusManager.setGui = Utils.appendedFunction(FocusManager.setGui, function(_, gui)
+	if gui == "ingameMenuSettings" then
+		-- Let the focus manager know about our custom controls now (earlier than this point seems to fail)
+		for _, control in pairs(SimpleInspector.CONTROLS) do
+			if not control.focusId or not FocusManager.currentFocusData.idToElementMapping[control.focusId] then
+				if not FocusManager:loadElementFromCustomValues(control, nil, nil, false, false) then
+					Logging.warning("Could not register control %s with the focus manager", control.id or control.name or control.focusId)
+				end
+			end
+		end
+		-- Invalidate the layout so the up/down connections are analyzed again by the focus manager
+		local settingsPage = g_gui.screenControllers[InGameMenu].pageSettings
+		settingsPage.generalSettingsLayout:invalidateLayout()
+	end
+end)
 

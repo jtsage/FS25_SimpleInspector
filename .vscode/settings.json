@@ -109,7 +109,11 @@
 		"FSCareerMissionInfo",
 		"InGameMenuSettingsFrame",
 		"g_hudAnchorRight",
-		"g_hudAnchorTop"
+		"g_hudAnchorTop",
+		"FocusManager",
+		"ItemSystem",
+		"InGameMenu",
+		"Logging"
 	],
 	"cSpell.words": [
 		"allfarms",

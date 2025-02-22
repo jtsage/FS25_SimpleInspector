@@ -9,8 +9,8 @@
 	<text name="title_simpleInspector"                   text="Simple Inspector" />
 	<text name="setting_simpleInspector_Visible"         text="Показать HUD" />
 	<text name="toolTip_simpleInspector_Visible"         text="При включении отображается дисплей." />
-	<text name="setting_simpleInspector_TextSize"        text="Размер шрифта" />
-	<text name="toolTip_simpleInspector_TextSize"        text="Размер шрифта для отображения, в относительных пикселях." />
+	<text name="setting_simpleInspector_SetValueTextSize"        text="Размер шрифта" />
+	<text name="toolTip_simpleInspector_SetValueTextSize"        text="Размер шрифта для отображения, в относительных пикселях." />
 	<text name="setting_simpleInspector_AlphaSort"       text="Сортировать список в алфавитном порядке" />
 	<text name="toolTip_simpleInspector_AlphaSort"       text="Если включено, список сортируется в алфавитном порядке, в противном случае используется порядок табуляции." />
 	<text name="setting_simpleInspector_ShowAll"         text="Показывать все" />

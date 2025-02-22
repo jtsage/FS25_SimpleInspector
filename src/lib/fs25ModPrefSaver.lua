@@ -62,27 +62,27 @@ end
 function FS25PrefSaver:getValue(name)
 	if self.settings[name] == nil then
 		if self.defaults[name] == nil or self.defaults[name][1] == nil then
-			self.debugger:print("UnKnown Setting: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
+			self.debugger:print("UnKnown Setting: " .. name, 5, "getValue")
 			return nil
 		else
-			self.debugger:print("UnSet Setting (return default): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
+			self.debugger:print("UnSet Setting (return default): " .. name, 5, "getValue")
 			return self.defaults[name][1]
 		end
 	else
-		self.debugger:print("Found Setting (return): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getValue")
+		self.debugger:print("Found Setting (return): " .. name, 5, "getValue")
 		return self.settings[name]
 	end
 end
 
 function FS25PrefSaver:setValue(name, newValue)
 	if self.settings[name] == nil and self.defaults[name] == nil then
-		self.debugger:print("Unknown Setting (return nil): " .. name, FS25Log.LOG_LEVEL.VERBOSE, "setValue")
+		self.debugger:print("Unknown Setting (return nil): " .. name, 5, "setValue")
 		return nil
 	end
 
 	self.settings[name] = newValue
 
-	self.debugger:print("Set Setting: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "setValue")
+	self.debugger:print("Set Setting: " .. name, 5, "setValue")
 
 	return self:getValue(name)
 end
@@ -118,7 +118,7 @@ function FS25PrefSaver:getXMLFileName()
 			self.fileName
 		)
 
-	self.debugger:print("XML File Name: " .. name, FS25Log.LOG_LEVEL.VERBOSE, "getXMLFileName")
+	self.debugger:print("XML File Name: " .. name, 5, "getXMLFileName")
 	return name
 end
 
@@ -168,7 +168,7 @@ function FS25PrefSaver:saveSettings()
 
 	saveXMLFile(xmlFile)
 
-	self.debugger:print("Saved Settings", FS25Log.LOG_LEVEL.DEVEL, "settingsFile")
+	self.debugger:print("Saved Settings", 4, "settingsFile")
 
 	if type(self.saveHookFunction) =="function" then
 		self.saveHookFunction()
@@ -227,7 +227,7 @@ function FS25PrefSaver:loadSettings()
 		delete(xmlFile)
 	end
 
-	self.debugger:print("Loaded Settings", FS25Log.LOG_LEVEL.DEVEL, "settingsFile")
+	self.debugger:print("Loaded Settings", 4, "settingsFile")
 
 	if type(self.loadHookFunction) =="function" then
 		self.loadHookFunction()
